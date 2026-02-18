@@ -218,6 +218,7 @@ public class OrderController : Controller
 - **User Profiles**: Kullanıcı profilleri ve sipariş geçmişi
 - **Role-Based Access**: Admin ve müşteri rolleri
 - **Email Verification**: Email doğrulama sistemi
+- **Slider Yönetimi**: Ana sayfa slider'larını ekleme/düzenme/silme
 
 ### 📊 Admin Özellikleri
 - **Dashboard**: İstatistikler ve grafikler
@@ -242,7 +243,7 @@ public class OrderController : Controller
 
 ### Adım 1: Repository'yi Klonlayın
 ```bash
-git clone https://github.com/kullanici-adiniz/ECommerce.git
+git clone https://github.com/eakkaya0/ECommerce.git
 cd ECommerce
 ```
 
@@ -309,6 +310,10 @@ https://localhost:7123
 <!-- Kullanıcı yönetimi ekran görüntüsü buraya eklenecek -->
 ![Kullanıcı Yönetimi](screenshots/user-management.png)
 
+### Slider Yönetimi
+<!-- Slider yönetimi ekran görüntüsü buraya eklenecek -->
+![Slider Yönetimi](screenshots/slider-management.png)
+
 ## 🗄 Veritabanı Şeması
 
 ### Ana Tablolar
@@ -319,6 +324,7 @@ https://localhost:7123
 - **ShoppingCarts**: Sepetler
 - **Orders**: Siparişler
 - **OrderItems**: Sipariş kalemleri
+- **Sliders**: Ana sayfa slider'ları
 
 ### İlişkiler
 ```
@@ -336,6 +342,7 @@ Orders 1:N OrderItems
 - **HomeController**: Ana sayfa ve ürün listeleme
 - **ProductController**: Ürün yönetimi (CRUD)
 - **CategoryController**: Kategori yönetimi
+- **SliderController**: Ana sayfa slider yönetimi
 - **ShoppingCartController**: Sepet işlemleri
 - **OrderController**: Sipariş yönetimi
 - **AccountController**: Kullanıcı işlemleri
@@ -349,6 +356,9 @@ POST /ShoppingCart/AddToCart        - Sepete ekle
 GET /Order/Checkout                - Checkout sayfası
 POST /Order/CompleteOrder           - Sipariş tamamla
 GET /Admin/Index                    - Admin paneli
+GET /Slider/Index                   - Slider yönetimi
+GET /Slider/Upsert/{id?}           - Slider ekleme/düzenleme
+POST /Slider/Upsert                 - Slider kaydet
 ```
 
 ## 🤝 Katkıda Bulunma
@@ -365,7 +375,7 @@ Bu proje MIT lisansı altında dağıtılmaktadır. Daha fazla bilgi için [LICE
 
 ## 👨‍💻 Geliştirici
 
-- **Ad Soyad** - *Initial work* - [GitHub Profile](https://github.com/kullanici-adiniz)
+- **Emre Akkaya** - *Initial work* - [GitHub Profile](https://github.com/eakkaya0)
 
 ## 🙏 Teşekkür
 
