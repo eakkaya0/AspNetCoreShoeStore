@@ -22,7 +22,7 @@ Modern, katmanlı mimariye sahip, SOLID prensiplerine uygun geliştirilmiş tam 
 
 ## 🎯 Proje Hakkında
 
-Bu proje, ASP.NET Core 8.0 kullanarak geliştirilmiş modern bir e-ticaret platformudur. Temel amacı, kullanıcıların ürünleri görüntüleyebilmesi, sepete ekleyebilmesi, sipariş verebilmesi ve yöneticilerin sistem yönetimini yapabildiği kapsamlı bir e-ticaret çözümü sunmaktır.
+Bu proje, ASP.NET Core 9.0 kullanarak geliştirilmiş modern bir ayakkabı e-ticaret platformudur. Temel amacı, kullanıcıların ayakkabı ürünlerini görüntüleyebilmesi, sepete ekleyebilmesi, sipariş verebilmesi ve yöneticilerin sistem yönetimini yapabildiği kapsamlı bir e-ticaret çözümü sunmaktır.
 
 ### Ana Hedefler
 - **Performans**: Optimiz edilmiş sorgular ve caching stratejileri
@@ -34,9 +34,9 @@ Bu proje, ASP.NET Core 8.0 kullanarak geliştirilmiş modern bir e-ticaret platf
 ## 🛠 Teknolojiler
 
 ### Backend
-- **.NET 8.0** - Framework
+- **.NET 9.0** - Framework
 - **ASP.NET Core MVC** - Web framework
-- **Entity Framework Core 8.0** - ORM
+- **Entity Framework Core 9.0** - ORM
 - **SQL Server** - Veritabanı
 - **ASP.NET Core Identity** - Authentication & Authorization
 - **AutoMapper** - Object mapping
@@ -72,7 +72,11 @@ ECommerce/
 │   ├── Views/                    # Razor Views
 │   ├── wwwroot/                  # Static assets
 │   └── Program.cs               # Application configuration
-└── ECommerce.Services/           # Business logic katmanı (gelecekte)
+├── ECommerce.Services/           # Business logic katmanı
+└── ECommerce.Utility/            # Utility katmanı
+    ├── Extensions/               # Extension metodlar
+    ├── Helpers/                  # Helper sınıflar
+    └── Constants/                # Sabit değerler
 ```
 
 ### Katmanların Sorumlulukları
@@ -91,6 +95,11 @@ ECommerce/
 - **Controllers**: HTTP isteklerini işler
 - **Views**: Kullanıcı arayüzü
 - **Static Assets**: CSS, JS, resimler
+
+#### 4. Utility Layer
+- **Extensions**: Extension metodlar (örn: string, datetime)
+- **Helpers**: Yardımcı sınıflar (örn: email, file operations)
+- **Constants**: Sabit değerler ve enum'lar
 
 ## 📐 SOLID Prensipleri
 
@@ -191,17 +200,17 @@ public class OrderController : Controller
 ## ✨ Özellikler
 
 ### 🏪 Ana Özellikler
-- **Ürün Yönetimi**: CRUD işlemleri, varyant desteği, soft delete
-- **Kategori Yönetimi**: Ana ve alt kategori yapısı
+- **Ayakkabı Ürün Yönetimi**: CRUD işlemleri, beden varyantları, soft delete
+- **Kategori Yönetimi**: Ana ve alt kategori yapısı (spor, günlük, klasik vb.)
 - **Sepet Sistemi**: Guest ve kullanıcı sepet yönetimi
 - **Sipariş Yönetimi**: Sipariş takibi, durum yönetimi
 - **Kullanıcı Yönetimi**: Registration, authentication, rol yönetimi
 
 ### 🛒 E-Ticaret Özellikleri
-- **Ürün Varyantları**: Beden/renk gibi varyant desteği
-- **Stok Yönetimi**: Otomatik stok düşme ve kontrol
+- **Ayakkabı Varyantları**: Beden (36-45) ve renk seçenekleri
+- **Stok Yönetimi**: Beden bazında stok takibi ve otomatik stok düşme
 - **Fiyatlandırma**: İndirimli fiyatlar ve vergi hesaplaması
-- **Arama ve Filtreleme**: Gelişmiş arama özellikleri
+- **Arama ve Filtreleme**: Marka, beden, renk filtreleme
 - **Ödeme Sistemi**: (Gelecekte entegrasyon)
 
 ### 👤 Kullanıcı Özellikleri
@@ -227,9 +236,9 @@ public class OrderController : Controller
 ## 🚀 Kurulum
 
 ### Gereksinimler
-- .NET 8.0 SDK
+- .NET 9.0 SDK
 - Visual Studio 2022 veya VS Code
-- SQL Server 2019+ veya SQL Server Express
+- SQL Server 2022 veya SQL Server Express
 
 ### Adım 1: Repository'yi Klonlayın
 ```bash
@@ -304,9 +313,9 @@ https://localhost:7123
 
 ### Ana Tablolar
 - **Users**: Kullanıcı bilgileri (ASP.NET Core Identity)
-- **Products**: Ürün bilgileri
-- **Categories**: Kategori bilgileri
-- **ProductVariants**: Ürün varyantları (beden, renk vb.)
+- **Products**: Ayakkabı ürün bilgileri
+- **Categories**: Kategori bilgileri (spor, günlük, klasik vb.)
+- **ProductVariants**: Ayakkabı beden ve renk varyantları
 - **ShoppingCarts**: Sepetler
 - **Orders**: Siparişler
 - **OrderItems**: Sipariş kalemleri
