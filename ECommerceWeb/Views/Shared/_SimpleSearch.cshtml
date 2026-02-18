@@ -1,0 +1,30 @@
+@model HomeVM
+
+<div class="simple-search-container mb-4">
+    <form asp-controller="Home" asp-action="Index" method="get" class="search-form">
+        <div class="input-group">
+            <input type="text" 
+                   class="form-control" 
+                   name="searchTerm" 
+                   placeholder="Ürün, marka ara..." 
+                   value="@Model.SearchTerm"
+                   autocomplete="off" />
+            <button class="btn btn-primary btn-sm" type="submit">
+                <i class="bi bi-search"></i> Ara
+            </button>
+        </div>
+
+        <!-- Aktif Arama Göster -->
+        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+        {
+            <div class="mt-2">
+                <small class="text-muted">
+                    Bulunan ürün: <strong>@Model.FilteredProducts.Count()</strong>
+                    <a href="@Url.Action("Index", "Home")" class="ms-2 btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Aramayı Temizle
+                    </a>
+                </small>
+            </div>
+        }
+    </form>
+</div>

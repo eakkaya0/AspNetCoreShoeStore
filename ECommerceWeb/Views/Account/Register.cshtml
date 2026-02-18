@@ -1,0 +1,101 @@
+@model ECommerce.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">
+                        <i class="bi bi-person-plus"></i> Yeni Hesap Oluştur
+                    </h2>
+
+                    <form method="post" asp-action="Register">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">
+                                    <i class="bi bi-person"></i> Ad
+                                </label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Adınız">
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">
+                                    <i class="bi bi-person"></i> Soyad
+                                </label>
+                                <input asp-for="LastName" class="form-control" placeholder="Soyadınız">
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">
+                                <i class="bi bi-envelope"></i> E-posta
+                            </label>
+                            <input asp-for="Email" class="form-control" placeholder="ornek@email.com">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">
+                                <i class="bi bi-shield-lock"></i> Şifre
+                            </label>
+                            <input asp-for="Password" class="form-control" placeholder="Şifreyi girin" id="password">
+                            <small class="form-text text-muted d-block mt-1">
+                                <i class="bi bi-info-circle"></i>
+                                Minimum 6 karakter, bir küçük harf ve bir sayı gereklidir.
+                            </small>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label">
+                                <i class="bi bi-shield-lock"></i> Şifre (Tekrar)
+                            </label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifreyi tekrar girin">
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-person-plus"></i> Hesap Oluştur
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">Zaten bir hesabınız var mı?</p>
+                        <a asp-action="Login" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Giriş Yap
+                        </a>
+                    </div>
+
+                    <div asp-validation-summary="All" class="alert alert-danger mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.getElementById('password')?.addEventListener('input', function (e) {
+            const password = e.target.value;
+            const confirmPassword = document.getElementById('ConfirmPassword');
+            
+            if (confirmPassword.value && password === confirmPassword.value) {
+                confirmPassword.classList.add('is-valid');
+                confirmPassword.classList.remove('is-invalid');
+            } else if (confirmPassword.value) {
+                confirmPassword.classList.add('is-invalid');
+                confirmPassword.classList.remove('is-valid');
+            }
+        });
+    </script>
+}
+

@@ -1,0 +1,46 @@
+@using ECommerce.Models
+@using ECommerce.Models.ViewModels
+@model CategoryFilterVM
+
+<form asp-controller="Home" asp-action="Index" method="get" class="row g-3 mb-4 align-items-end">
+
+    <div class="col-md-4">
+        <label class="form-label">Ana Kategori</label>
+        <select name="mainCategoryId"
+                class="form-select">
+            <option value="" selected="@(!Model.SelectedMainCategoryId.HasValue ? "selected" : null)">Tüm Kategoriler</option>
+            @foreach (var main in Model.MainCategories)
+            {
+                <option value="@main.Id"
+                        selected="@(Model.SelectedMainCategoryId.HasValue && Model.SelectedMainCategoryId.Value == main.Id ? "selected" : null)">
+                    @main.Name
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Alt Kategori</label>
+        <select name="subCategoryId"
+                class="form-select"
+                @(Model.SelectedMainCategoryId.HasValue ? "" : "disabled")>
+            <option value="">Tümü</option>
+            @if (Model.SubCategories != null)
+            {
+                foreach (var sub in Model.SubCategories)
+                {
+                    <option value="@sub.Id"
+                            selected="@(Model.SelectedSubCategoryId.HasValue && Model.SelectedSubCategoryId.Value == sub.Id ? "selected" : null)">
+                        @sub.Name
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-secondary w-100">
+            Filtrele
+        </button>
+    </div>
+</form>

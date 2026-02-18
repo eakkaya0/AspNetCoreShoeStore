@@ -1,0 +1,68 @@
+@model List<ECommerce.Models.Models.Slider>
+
+@{
+    ViewData["Title"] = "Slider Listesi";
+}
+
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Slider Listesi</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Slider" asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Yeni Slider Ekle
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Görsel</th>
+                <th>Başlık</th>
+                <th>Açıklama</th>
+                <th>Sıra</th>
+                <th>Durum</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var slider in Model)
+            {
+                <tr>
+                    <td>@slider.Id</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(slider.ImageUrl))
+                        {
+                            <img src="@slider.ImageUrl" alt="@slider.Title" style="width: 100px; height: 60px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Görsel yok</span>
+                        }
+                    </td>
+                    <td>@slider.Title</td>
+                    <td>@(slider.Description?.Length > 50 ? slider.Description.Substring(0, 50) + "..." : slider.Description)</td>
+                    <td>@slider.DisplayOrder</td>
+                    <td>
+                        @(slider.IsActive ? "Aktif" : "Pasif")
+                    </td>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            <a asp-controller="Slider" asp-action="Edit" asp-route-id="@slider.Id" class="btn btn-primary mx-2">
+                                <i class="bi bi-pencil-square"></i> Düzenle
+                            </a>
+                            <a asp-controller="Slider" asp-action="Delete" asp-route-id="@slider.Id" class="btn btn-danger mx-2">
+                                <i class="bi bi-trash"></i> Sil
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

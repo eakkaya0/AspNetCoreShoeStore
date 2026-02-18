@@ -1,0 +1,230 @@
+@model ECommerce.Models.ViewModels.ProductDetailVM
+@{
+    ViewData["Title"] = Model.Product.Name;
+    var p = Model.Product;
+    var hasDiscount = p.DiscountRate.HasValue && p.DiscountRate.Value > 0;
+    var totalStock = Model.SizeStocks.Any() ? Model.SizeStocks.Sum(x => x.Stock) : Model.Product.StockQuantity;
+    var hasSizes = Model.SizeStocks.Any();
+    var lastStockMessage = Model.LastStockWarningThreshold.HasValue && totalStock > 0 && totalStock <= Model.LastStockWarningThreshold.Value;
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ürünler</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@p.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sol: Görsel galeri -->
+        <div class="col-lg-5 mb-4">
+            <div class="product-gallery">
+                <div class="product-detail-image-wrap bg-light rounded overflow-hidden position-relative mb-2" id="mainImageWrap">
+                    @if (Model.ImageUrls.Any())
+                    {
+                        <img id="mainProductImage" src="@Model.ImageUrls.First()" alt="@p.Name" class="img-fluid w-100 product-zoom-img" />
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center text-muted py-5">Görsel yok</div>
+                    }
+                    @if (hasDiscount)
+                    {
+                        <span class="product-badge product-badge-discount position-absolute top-0 start-0 m-2">%@p.DiscountRate!.Value</span>
+                    }
+                </div>
+                @if (Model.ImageUrls.Count > 1)
+                {
+                    <div class="product-thumbnails d-flex gap-2 flex-wrap">
+                        @for (var i = 0; i < Model.ImageUrls.Count; i++)
+                        {
+                            <button type="button" class="product-thumb btn border rounded p-0 @(i == 0 ? "active" : "")" data-src="@Model.ImageUrls[i]" aria-label="Görsel @(i+1)">
+                                <img src="@Model.ImageUrls[i]" alt="" class="rounded" style="width:64px;height:64px;object-fit:cover;" />
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <h1 class="h3 mb-2">@p.Name</h1>
+            <p class="text-muted mb-2">@p.Brand</p>
+            @if (p.Category != null)
+            {
+                <p class="small text-muted mb-3">
+                    Kategori:
+                    @(p.Category.ParentCategory != null
+                        ? $"{p.Category.ParentCategory.Name} / {p.Category.Name}"
+                        : p.Category.Name)
+                </p>
+            }
+
+            <div class="product-detail-price mb-3">
+                @if (hasDiscount && p.DiscountedPrice.HasValue)
+                {
+                    <span class="fs-3 fw-bold text-danger">@p.DiscountedPrice.Value.ToString("C")</span>
+                    <span class="text-muted text-decoration-line-through ms-2">@p.ListPrice.ToString("C")</span>
+                }
+                else
+                {
+                    <span class="fs-3 fw-bold">@p.ListPrice.ToString("C")</span>
+                }
+            </div>
+
+            @if (lastStockMessage)
+            {
+                <p class="text-warning fw-semibold mb-2"><i class="bi bi-exclamation-triangle"></i> Stokta az ürün kaldı!</p>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(p.Description))
+            {
+                <div class="mb-3">
+                    <h6 class="fw-bold">Açıklama</h6>
+                    <p class="text-secondary">@Html.Raw(p.Description)</p>
+                </div>
+            }
+
+            <ul class="list-unstyled mb-3">
+                @if (!string.IsNullOrWhiteSpace(p.Color))
+                {
+                    <li><strong>Renk:</strong> @p.Color</li>
+                }
+                <li><strong>Stok:</strong> @(totalStock > 0 ? "Stokta" : "Tükendi")</li>
+            </ul>
+
+            <!-- Beden seçimi -->
+            @if (hasSizes)
+            {
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Beden seçin</label>
+                    <div class="d-flex flex-wrap gap-2" id="sizeSelector">
+                        @foreach (var item in Model.SizeStocks)
+                        {
+                            var disabled = item.Stock <= 0;
+                            <button type="button"
+                                    class="btn btn-outline-secondary size-btn @(disabled ? "disabled" : "")"
+                                    data-size="@item.Size"
+                                    data-stock="@item.Stock.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    data-variant-id="@(item.VariantId ?? 0)"
+                                    @(disabled ? "disabled" : "")>
+                                @item.Size
+                                @if (item.Stock <= 0)
+                                {
+                                    <span class="small text-muted">(Tükendi)</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Adet seçimi: her beden için stok kadar seçenek -->
+            <div class="mb-3" id="quantitySection" data-requires-size="@(hasSizes ? "true" : "false")">
+                <label class="form-label fw-bold">Adet</label>
+                <div class="d-flex align-items-center gap-2">
+                    @if (hasSizes)
+                    {
+                        <select id="productQuantity" class="form-select form-select-sm" style="width:90px;" disabled>
+                            <option value="1">1</option>
+                        </select>
+                        <small class="text-muted">Önce beden seçin</small>
+                    }
+                    else
+                    {
+                        <select id="productQuantity" class="form-select form-select-sm" style="width:90px;">
+                            @for (var i = 1; i <= Math.Max(1, totalStock); i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    }
+                </div>
+                <small id="quantityInfo" class="text-muted d-block mt-1">Seçilen: -</small>
+            </div>
+
+            <!-- Sepete Ekle (beden varsa seçilmeden pasif) -->
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Geri</a>
+                <button type="button"
+                        class="btn btn-primary btn-add-cart"
+                        id="btnAddToCart"
+                        data-product-id="@p.Id"
+                        data-product-name="@p.Name"
+                        @(totalStock == 0 ? "disabled" : (hasSizes ? "disabled" : ""))>
+                    <i class="bi bi-cart-plus"></i> Sepete Ekle
+                </button>
+            </div>
+
+            <!-- Güven unsurları -->
+            <div class="border rounded p-3 bg-light">
+                <div class="row g-2 small">
+                    <div class="col-6 col-md-3 d-flex align-items-center gap-2">
+                        <span class="fs-5">🚚</span>
+                        <span>2-3 iş günü teslimat</span>
+                    </div>
+                    <div class="col-6 col-md-3 d-flex align-items-center gap-2">
+                        <span class="fs-5">🔄</span>
+                        <span>14 gün iade</span>
+                    </div>
+                    <div class="col-6 col-md-3 d-flex align-items-center gap-2">
+                        <span class="fs-5">💳</span>
+                        <span>Kapıda ödeme</span>
+                    </div>
+                    <div class="col-6 col-md-3 d-flex align-items-center gap-2">
+                        <span class="fs-5">🔒</span>
+                        <span>Güvenli ödeme</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benzer ürünler -->
+    @if (Model.SimilarProducts.Any())
+    {
+        <hr class="my-5" />
+        <h5 class="mb-3">Benzer Ürünler</h5>
+        <div class="row g-3">
+            @foreach (var similar in Model.SimilarProducts)
+            {
+                var simHasDiscount = similar.DiscountRate.HasValue && similar.DiscountRate.Value > 0;
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Product" asp-action="Details" asp-route-id="@similar.Id" class="text-decoration-none text-dark">
+                        <div class="card h-100 border rounded overflow-hidden">
+                            @if (!string.IsNullOrEmpty(similar.ImageUrl))
+                            {
+                                <img src="@similar.ImageUrl" class="card-img-top" alt="@similar.Name" style="height:180px;object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height:180px;">Görsel yok</div>
+                            }
+                            <div class="card-body p-2">
+                                <h6 class="card-title small mb-1 text-truncate">@similar.Name</h6>
+                                <p class="mb-0 small">
+                                    @if (simHasDiscount && similar.DiscountedPrice.HasValue)
+                                    {
+                                        <span class="text-danger fw-bold">@similar.DiscountedPrice.Value.ToString("C")</span>
+                                        <span class="text-muted text-decoration-line-through">@similar.ListPrice.ToString("C")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-bold">@similar.ListPrice.ToString("C")</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/product-detail.js" asp-append-version="true"></script>
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

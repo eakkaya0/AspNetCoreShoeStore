@@ -1,0 +1,103 @@
+@using ECommerce.Models.ViewModels
+@model HomeVM
+
+@{
+    ViewData["Title"] = "Anasayfa";
+    bool hasSearch = !string.IsNullOrWhiteSpace(Model.SearchTerm);
+    bool hasFilter = Model.SelectedMainCategoryId.HasValue || Model.SelectedSubCategoryId.HasValue;
+}
+
+<div class="container py-4 home-page">
+
+    <!-- Slider -->
+    <partial name="_Slider" model="Model.Sliders" />
+
+    <!-- Basit Arama Bölümü -->
+    <section class="search-section mb-4">
+        <partial name="_SimpleSearch" model="Model" />
+    </section>
+
+    <!-- Kategori Filtresi -->
+    <section class="filter-section mb-4">
+        <partial name="_CategoryFilter" model="Model.CategoryFilter" />
+    </section>
+
+    @if (hasSearch || hasFilter)
+    {
+        <!-- Arama/Filtreleme sonuçları -->
+        <section class="search-results mb-5">
+            @if (hasSearch)
+            {
+                <h2 class="h4 mb-3">
+                    Arama Sonuçları: <strong>"@Model.SearchTerm"</strong>
+                </h2>
+            }
+            else
+            {
+                <h2 class="h4 mb-3">
+                    Filtreleme Sonuçları
+                </h2>
+            }
+
+            @await Html.PartialAsync("_ProductSection",
+                new ProductSectionVM
+                {
+                    Title = "",
+                    Products = Model.FilteredProducts,
+                    CssClass = "search-results-products"
+                })
+        </section>
+    }
+    else
+    {
+        <!-- Ana sayfa: Öne çıkan bölümler + Tüm Ürünler -->
+        <section class="new-products-section mb-5">
+            @await Html.PartialAsync("_ProductSection",
+                new ProductSectionVM
+                {
+                    Title = "Yeni Ürünler",
+                    Products = Model.NewProducts,
+                    CssClass = "new-products"
+                })
+        </section>
+
+        <section class="discounted-products-section mb-5">
+            @await Html.PartialAsync("_ProductSection",
+                new ProductSectionVM
+                {
+                    Title = "İndirimli Ürünler",
+                    Products = Model.DiscountedProducts,
+                    CssClass = "discounted-products"
+                })
+        </section>
+
+        <section class="best-sellers-section mb-5">
+            @await Html.PartialAsync("_ProductSection",
+                new ProductSectionVM
+                {
+                    Title = "En Çok Satanlar",
+                    Products = Model.BestSellingProducts,
+                    CssClass = "best-sellers"
+                })
+        </section>
+
+        <!-- Tüm Ürünler bölümü -->
+        <section id="tum-urunler" class="all-products-section mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0">Tüm Ürünler</h2>
+            </div>
+
+            @await Html.PartialAsync("_ProductSection",
+                new ProductSectionVM
+                {
+                    Title = "",
+                    Products = Model.AllProducts,
+                    CssClass = "all-products"
+                })
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

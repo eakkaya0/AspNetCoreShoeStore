@@ -1,0 +1,47 @@
+@model ECommerce.Models.Models.Category
+
+@{
+    ViewData["Title"] = "Kategori Sil";
+}
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-danger">Kategori Sil</h2>
+            <hr />
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Kategori Adı</label>
+            <input value="@Model.Name" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Sıra</label>
+            <input value="@Model.DisplayOrder" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Durum</label>
+            <input value="@(Model.IsActive ? "Aktif" : "Pasif")" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Üst Kategori</label>
+            <input value="@(Model.ParentCategory?.Name ?? "Ana Kategori")" class="form-control" disabled />
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-danger form-control">Sil</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Category" asp-action="Index" class="btn btn-secondary border form-control">İptal</a>
+            </div>
+        </div>
+    </div>
+</form>

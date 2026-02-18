@@ -1,0 +1,214 @@
+@model ECommerce.Models.ViewModels.OrderDetailsVM
+@{
+    ViewData["Title"] = "Sipariş Detayları";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Sol Taraf - Müşteri Bilgileri ve Ödeme -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user"></i> Müşteri Bilgileri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CompleteOrder" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">Ad *</label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">Soyad *</label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label">E-posta *</label>
+                                <input asp-for="Email" class="form-control" type="email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label">Telefon *</label>
+                                <input asp-for="Phone" class="form-control" type="tel" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="City" class="form-label">Şehir *</label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Adres *</label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">Sipariş Notu (Opsiyonel)</label>
+                            <textarea asp-for="Notes" class="form-control" rows="2" 
+                                      placeholder="Siparişinizle ilgili notlarınızı buraya yazabilirsiniz..."></textarea>
+                        </div>
+
+                        <!-- Ödeme Bilgileri -->
+                        <hr class="my-4">
+                        <h6 class="mb-3">
+                            <i class="fas fa-credit-card"></i> Ödeme Bilgileri
+                        </h6>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Test ödemesi için kart bilgileri girmeniz gerekmektedir.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label asp-for="CardHolderName" class="form-label">Kart Üzerindeki İsim</label>
+                                <input asp-for="CardHolderName" class="form-control" placeholder="Ahmet Yılmaz" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label asp-for="CardNumber" class="form-label">Kart Numarası</label>
+                                <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ExpiryMonth" class="form-label">Ay</label>
+                                <select asp-for="ExpiryMonth" class="form-control">
+                                    <option value="">AA</option>
+                                    @for (int i = 1; i <= 12; i++)
+                                    {
+                                        <option value="@i.ToString("D2")">@i.ToString("D2")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="ExpiryYear" class="form-label">Yıl</label>
+                                <select asp-for="ExpiryYear" class="form-control">
+                                    <option value="">YY</option>
+                                    @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="CVV" class="form-label">CVV</label>
+                                <input asp-for="CVV" class="form-control" placeholder="123" maxlength="4" />
+                            </div>
+                        </div>
+
+                        <input type="hidden" asp-for="Subtotal" />
+                        <input type="hidden" asp-for="ShippingCost" />
+                        <input type="hidden" asp-for="GrandTotal" />
+                        <input type="hidden" asp-for="IsGuestUser" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-lock"></i> Güvenli Ödeme ve Siparişi Tamamla
+                            </button>
+                            <a asp-action="Index" asp-controller="ShoppingCart" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Sepete Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Taraf - Sipariş Özeti -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shopping-cart"></i> Sipariş Özeti
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <!-- Ürünler Listesi -->
+                    <div class="mb-3">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">@item.ProductName</h6>
+                                    @if (!string.IsNullOrEmpty(item.VariantInfo))
+                                    {
+                                        <small class="text-muted">Beden: @item.VariantInfo</small>
+                                    }
+                                    <br>
+                                    <small class="text-muted">@item.Count x ₺@item.UnitPrice.ToString("F2")</small>
+                                </div>
+                                <div class="text-end">
+                                    <strong>₺@item.TotalPrice.ToString("F2")</strong>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Toplam Bilgiler -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ara Toplam:</span>
+                            <span>₺@Model.Subtotal.ToString("F2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Kargo:</span>
+                            <span>@(Model.ShippingCost == 0 ? "Ücretsiz" : "₺" + Model.ShippingCost.ToString("F2"))</span>
+                        </div>
+                        @if (Model.ShippingCost == 0)
+                        {
+                            <div class="alert alert-success py-2 mb-2">
+                                <small><i class="fas fa-truck"></i> 500 TL üzeri kargo ücretsiz!</small>
+                            </div>
+                        }
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-0">Genel Toplam:</h5>
+                            <h5 class="mb-0 text-primary">₺@Model.GrandTotal.ToString("F2")</h5>
+                        </div>
+                    </div>
+
+                    <!-- Güvenlik Bilgisi -->
+                    <div class="alert alert-light py-2">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i> 
+                            Ödeme bilgileriniz SSL ile şifrelenmektedir.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Kart numarası formatlama
+        document.getElementById('CardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Sadece sayı girişi
+        document.getElementById('CVV').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+}

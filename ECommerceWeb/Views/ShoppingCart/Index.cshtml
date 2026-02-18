@@ -1,0 +1,410 @@
+@model ECommerce.Models.ViewModels.ShoppingCartVM
+@{
+    ViewData["Title"] = "Sepetim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-shopping-cart"></i> Sepetim
+                <span class="badge bg-primary ms-2">@Model.TotalItems</span>
+            </h2>
+        </div>
+    </div>
+
+    @if (!Model.CartItems.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-shopping-basket fa-3x mb-3"></i>
+                    <h4>Sepetiniz boş</h4>
+                    <p class="mb-3">Henüz sepetinize ürün eklemediniz.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Alışverişe Devam Et
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Sepet Ürünleri -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Sepet Ürünleri (@Model.TotalItems ürün)
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="cart-item border-bottom p-3" data-cart-item-id="@item.Id" data-product-id="@item.ProductId">
+                                <div class="row align-items-center">
+                                    <!-- Ürün Görseli -->
+                                    <div class="col-md-2 col-3">
+                                        <img src="@(item.ProductImageUrl ?? "/images/placeholder-product.jpg")" 
+                                             alt="@item.ProductName" 
+                                             class="img-fluid rounded"
+                                             style="max-height: 80px; object-fit: cover;">
+                                    </div>
+
+                                    <!-- Ürün Bilgileri -->
+                                    <div class="col-md-6 col-7">
+                                        <h6 class="mb-1">@item.ProductName</h6>
+                                        @if (!string.IsNullOrEmpty(item.VariantInfo))
+                                        {
+                                            <small class="text-muted">
+                                                <i class="fas fa-ruler"></i> Beden: @item.VariantInfo
+                                            </small>
+                                        }
+                                        <div class="mt-2">
+                                            <span class="fw-bold text-primary">@item.UnitPrice.ToString("C2")</span>
+                                            @if (!item.InStock)
+                                            {
+                                                <span class="badge bg-danger ms-2">Stokta Yok</span>
+                                            }
+                                            else if (!item.HasEnoughStock)
+                                            {
+                                                <span class="badge bg-warning ms-2">Yetersiz Stok (@item.StockQuantity adet)</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Adet ve İşlemler -->
+                                    <div class="col-md-4 col-12 mt-3 mt-md-0">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <!-- Adet Güncelleme -->
+                                            <div class="quantity-controls">
+                                                <div class="input-group input-group-sm" style="width: 120px;">
+                                                    <button class="btn btn-outline-secondary decrease-qty" type="button">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" class="form-control text-center quantity-input" 
+                                                           value="@item.Count" min="1" max="1000" readonly>
+                                                    <button class="btn btn-outline-secondary increase-qty" type="button">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Toplam Fiyat -->
+                                            <div class="text-end">
+                                                <div class="fw-bold">@item.TotalPrice.ToString("C2")</div>
+                                                <button class="btn btn-sm btn-outline-danger remove-item mt-1">
+                                                    <i class="fas fa-trash"></i> Sil
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Sepet İşlemleri -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="/" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left"></i> Alışverişe Devam Et
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-outline-danger" id="clearCartBtn">
+                                    <i class="fas fa-trash-alt"></i> Sepeti Boşalt
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Özet -->
+            <div class="col-lg-4 mt-3 mt-lg-0">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calculator"></i> Sipariş Özeti
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ara Toplam (@Model.TotalItems ürün):</span>
+                            <strong>@Model.CartTotal.ToString("C2")</strong>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Kargo:</span>
+                            <strong>
+                                @if (Model.ShippingCost == 0)
+                                {
+                                    <span class="text-success">Ücretsiz</span>
+                                }
+                                else
+                                {
+                                    @Model.ShippingCost.ToString("C2")
+                                }
+                            </strong>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5>Genel Toplam:</h5>
+                            <h4 class="text-primary">@Model.GrandTotal.ToString("C2")</h4>
+                        </div>
+
+                        @if (Model.CartItems.Any(item => !item.InStock || !item.HasEnoughStock))
+                        {
+                            <div class="alert alert-warning mb-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <small>
+                                    Stok durumu uygun olmayan ürünler var. Lütfen sepetinizi kontrol edin.
+                                </small>
+                            </div>
+                        }
+
+                        <a href="@Url.Action("OrderDetails", "Order")" class="btn btn-success btn-lg w-100 @(Model.CartItems.Any(item => !item.InStock || !item.HasEnoughStock) ? "disabled" : "")" 
+                           id="checkoutBtn">
+                            <i class="fas fa-credit-card"></i> Siparişi Tamamla
+                        </a>
+
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt"></i> Güvenli Alışveriş
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Güvenlik Bilgisi -->
+                <div class="card mt-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-lock fa-2x text-muted mb-2"></i>
+                        <h6>Güvenli Ödeme</h6>
+                        <small class="text-muted">
+                            Bilgileriniz 256-bit SSL şifrelemesi ile korunmaktadır.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Yükleniyor...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Adet azaltma
+            $(document).on('click', '.decrease-qty', function() {
+                var input = $(this).siblings('.quantity-input');
+                var currentQty = parseInt(input.val());
+                if (currentQty > 1) {
+                    updateQuantity(input, currentQty - 1);
+                }
+            });
+
+            // Adet artırma
+            $(document).on('click', '.increase-qty', function() {
+                var input = $(this).siblings('.quantity-input');
+                var currentQty = parseInt(input.val());
+                if (currentQty < 1000) {
+                    updateQuantity(input, currentQty + 1);
+                }
+            });
+
+            // Adet güncelleme fonksiyonu
+            function updateQuantity(input, newQuantity) {
+                var cartItemId = input.closest('.cart-item').data('cart-item-id');
+                console.log('UpdateQuantity - CartItemId:', cartItemId, 'NewQuantity:', newQuantity);
+                
+                if (!cartItemId || cartItemId === 0 || isNaN(parseInt(cartItemId))) {
+                    console.error('Invalid cart item ID:', cartItemId);
+                    showNotification('Geçersiz ürün ID.', 'error');
+                    return;
+                }
+                
+                showLoading();
+                
+                $.ajax({
+                    url: '@Url.Action("UpdateQuantity", "ShoppingCart")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        cartItemId: parseInt(cartItemId),
+                        quantity: newQuantity
+                    }),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        hideLoading();
+                        if (response.success) {
+                            input.val(newQuantity);
+                            
+                            // Item total güncelle
+                            var itemDiv = input.closest('.cart-item');
+                            var itemTotalElement = itemDiv.find('.text-end .fw-bold');
+                            itemTotalElement.text(response.itemTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }));
+                            
+                            // Cart total güncelle
+                            updateCartTotals(response.cartTotal, response.totalItems);
+                            
+                            showNotification(response.message, 'success');
+                        } else {
+                            showNotification(response.message, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoading();
+                        console.error('UpdateQuantity Error:', xhr.responseText);
+                        showNotification('Bir hata oluştu: ' + (xhr.responseJSON?.message || error), 'error');
+                    }
+                });
+            }
+
+            // Ürün silme
+            $(document).on('click', '.remove-item', function() {
+                if (!confirm('Bu ürünü sepetten kaldırmak istediğinizden emin misiniz?')) {
+                    return;
+                }
+
+                var cartItemDiv = $(this).closest('.cart-item');
+                var cartItemId = cartItemDiv.data('cart-item-id');
+                var productId = cartItemDiv.data('product-id');
+                
+                showLoading();
+                
+                $.ajax({
+                    url: '@Url.Action("RemoveFromCart", "ShoppingCart")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        cartItemId: parseInt(cartItemId) || 0,
+                        productId: parseInt(productId) || 0
+                    }),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        hideLoading();
+                        if (response.success) {
+                            // Sadece tıklanan ürünü kaldır
+                            cartItemDiv.fadeOut(300, function() {
+                                $(this).remove();
+                                
+                                // Sepet boş kontrolü
+                                if ($('.cart-item').length === 0) {
+                                    location.reload();
+                                } else {
+                                    updateCartTotals(response.cartTotal, response.totalItems);
+                                }
+                            });
+                            
+                            showNotification(response.message, 'success');
+                        } else {
+                            showNotification(response.message, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoading();
+                        console.error('RemoveFromCart Error:', xhr.responseText);
+                        showNotification('Bir hata oluştu: ' + (xhr.responseJSON?.message || error), 'error');
+                    }
+                });
+            });
+
+            // Sepeti boşalt
+            $('#clearCartBtn').click(function() {
+                if (!confirm('Sepetinizi tamamen boşaltmak istediğinizden emin misiniz?')) {
+                    return;
+                }
+
+                showLoading();
+                
+                $.ajax({
+                    url: '@Url.Action("ClearCart", "ShoppingCart")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({}),
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        hideLoading();
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            showNotification(response.message, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoading();
+                        console.error('ClearCart Error:', xhr.responseText);
+                        showNotification('Bir hata oluştu: ' + (xhr.responseJSON?.message || error), 'error');
+                    }
+                });
+            });
+
+            // Sepet toplamlarını güncelle
+            function updateCartTotals(cartTotal, totalItems) {
+                // Ara toplam
+                $('.d-flex.justify-content-between span:contains("Ara Toplam")').next('strong').text(
+                    cartTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })
+                );
+                
+                // Genel toplam
+                $('.h4.text-primary').text(
+                    cartTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })
+                );
+                
+                // Ürün sayısı
+                $('.badge').text(totalItems);
+                $('span:contains("ürün")').each(function() {
+                    if ($(this).text().includes('Sepet Ürünleri')) {
+                        $(this).text(`Sepet Ürünleri (${totalItems} ürün)`);
+                    }
+                });
+            }
+
+            // Loading göster/gizle
+            function showLoading() {
+                $('#loadingSpinner').removeClass('d-none').addClass('position-fixed top-50 start-50');
+            }
+
+            function hideLoading() {
+                $('#loadingSpinner').addClass('d-none').removeClass('position-fixed top-50 start-50');
+            }
+
+            // Bildirim göster
+            function showNotification(message, type) {
+                var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                var alertHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 9999;">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                $('body').append(alertHtml);
+                
+                setTimeout(function() {
+                    $('.alert').alert('close');
+                }, 3000);
+            }
+        });
+    </script>
+}

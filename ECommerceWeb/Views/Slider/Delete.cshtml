@@ -1,0 +1,57 @@
+@model ECommerce.Models.Models.Slider
+
+@{
+    ViewData["Title"] = "Slider Sil";
+}
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-danger">Slider Sil</h2>
+            <hr />
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Başlık</label>
+            <input value="@Model.Title" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Açıklama</label>
+            <textarea class="form-control" rows="3" disabled>@Model.Description</textarea>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Görsel</label>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="mb-2">
+                    <img src="@Model.ImageUrl" alt="@Model.Title" style="max-width: 300px; max-height: 200px;" />
+                </div>
+            }
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Sıra</label>
+            <input value="@Model.DisplayOrder" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3 row">
+            <label class="form-label">Durum</label>
+            <input value="@(Model.IsActive ? "Aktif" : "Pasif")" class="form-control" disabled />
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-danger form-control">Sil</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Slider" asp-action="Index" class="btn btn-secondary border form-control">İptal</a>
+            </div>
+        </div>
+    </div>
+</form>

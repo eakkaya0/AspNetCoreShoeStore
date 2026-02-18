@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Ürün Yönetimi";
+}
+
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">Ürün Listesi</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Product" asp-action="Upsert" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Yeni Ürün Ekle
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <table id="tblData" class="table table-bordered table-striped w-100">
+                <thead>
+                    <tr>
+                        <th>Görsel</th>
+                        <th>Ürün Adı</th>
+                        <th>Marka</th>
+                        <th>Kategori</th>
+                        <th>Fiyat</th>
+                        <th>İndirim</th>
+                        <th>Stok</th>
+                        <th>Renk</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/product.js" asp-append-version="true"></script>
+}

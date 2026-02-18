@@ -1,0 +1,90 @@
+@model IEnumerable<ECommerce.Models.ViewModels.OrderSummaryVM>
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-shopping-bag"></i> Siparişlerim
+            </h2>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-box fa-3x mb-3"></i>
+                    <h4>Henüz siparişiniz bulunmuyor</h4>
+                    <p class="mb-3">Alışveriş yapmaya başlamak için ürünlerimizi inceleyebilirsiniz.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Alışverişe Devam Et
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sipariş No</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                        <th>Ürün Sayısı</th>
+                                        <th>Toplam</th>
+                                        <th>Ödeme</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@order.OrderNumber</strong>
+                                            </td>
+                                            <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>
+                                                <span class="badge bg-@order.StatusColor">
+                                                    @order.StatusText
+                                                </span>
+                                            </td>
+                                            <td>@order.OrderItems.Sum(x => x.Quantity)</td>
+                                            <td><strong>₺@order.GrandTotal.ToString("F2")</strong></td>
+                                            <td>
+                                                @if (order.IsPaid)
+                                                {
+                                                    <span class="badge bg-success">Ödendi</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Bekliyor</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("OrderDetails", new { id = order.Id })" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Detay
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

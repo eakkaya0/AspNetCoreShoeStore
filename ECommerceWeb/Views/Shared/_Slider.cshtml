@@ -1,0 +1,49 @@
+@using ECommerce.Models.Models
+@model IEnumerable<Slider>
+
+@if (Model != null && Model.Any())
+{
+    <div id="homeSlider" class="carousel slide mb-4" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <button type="button"
+                        data-bs-target="#homeSlider"
+                        data-bs-slide-to="@i"
+                        class="@(i == 0 ? "active" : "")"
+                        aria-current="@(i == 0 ? "true" : "false")"
+                        aria-label="Slide @(i + 1)"></button>
+            }
+        </div>
+
+        <div class="carousel-inner rounded-3 overflow-hidden shadow">
+            @{
+                var index = 0;
+            }
+            @foreach (var slide in Model)
+            {
+                var isActive = index == 0 ? "active" : "";
+                <div class="carousel-item @isActive">
+                    <img src="@slide.ImageUrl" class="d-block w-100" alt="@slide.Title" />
+                    <div class="carousel-caption bg-dark bg-opacity-50 rounded-3 p-2 p-sm-3">
+                        <h5>@slide.Title</h5>
+                        @if (!string.IsNullOrWhiteSpace(slide.Description))
+                        {
+                            <p>@slide.Description</p>
+                        }
+                    </div>
+                </div>
+                index++;
+            }
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeSlider" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeSlider" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}

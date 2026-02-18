@@ -1,0 +1,78 @@
+@using ECommerce.Models.ViewModels
+@model ProductSectionVM
+
+@if (Model.Products != null && Model.Products.Any())
+{
+    <section class="product-section mb-4 @Model.CssClass">
+        @if (!string.IsNullOrWhiteSpace(Model.Title))
+        {
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h5 mb-0 section-title">@Model.Title</h3>
+            </div>
+        }
+        <div class="row g-3 product-grid">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card product-card h-100 shadow-sm">
+                        <div class="product-card-image-wrap">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="text-decoration-none text-dark d-block">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl"
+                                         class="card-img-top product-card-img"
+                                         alt="@product.Name"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="product-card-img product-card-no-image card-img-top">Görsel yok</div>
+                                }
+                            </a>
+                            @if (product.DiscountRate.HasValue && product.DiscountRate.Value > 0)
+                            {
+                                <span class="product-badge product-badge-discount">%@((int)product.DiscountRate.Value)</span>
+                            }
+                            @if (product.StockQuantity == 0)
+                            {
+                                <span class="product-badge product-badge-out">Tükendi</span>
+                            }
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="text-decoration-none text-dark">
+                                <h6 class="card-title product-card-title text-truncate" title="@product.Name">@product.Name</h6>
+                                <p class="small text-muted mb-1">@product.Brand</p>
+                            </a>
+                            <div class="product-price mt-auto">
+                                @if (product.DiscountedPrice.HasValue)
+                                {
+                                    <span class="fw-bold text-danger fs-6">@product.DiscountedPrice.Value.ToString("C")</span>
+                                    <small class="text-muted text-decoration-line-through d-block">@product.ListPrice.ToString("C")</small>
+                                }
+                                else
+                                {
+                                    <span class="fw-bold fs-6">@product.ListPrice.ToString("C")</span>
+                                }
+                            </div>
+                            <div class="product-card-actions mt-2">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-eye"></i> Detay
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+else
+{
+    <section class="product-section mb-4 @Model.CssClass">
+        @if (!string.IsNullOrWhiteSpace(Model.Title))
+        {
+            <h3 class="h5 mb-2">@Model.Title</h3>
+        }
+        <p class="text-muted">Bu bölümde gösterilecek ürün bulunmamaktadır.</p>
+    </section>
+}

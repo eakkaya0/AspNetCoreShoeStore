@@ -1,0 +1,124 @@
+@model ECommerce.Models.Models.Product
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-danger bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Ürün Sil</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Dikkat!</strong> Bu ürünü silmek istediğinizden emin misiniz?
+        </div>
+
+        <div class="border p-3 mb-3">
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Ürün Adı:</div>
+                <div class="col-md-8">@Model.Name</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Marka:</div>
+                <div class="col-md-8">@Model.Brand</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Kategori:</div>
+                <div class="col-md-8">
+                    @if (Model.Category != null)
+                    {
+                        if (Model.Category.ParentCategory != null)
+                        {
+                            <span>@Model.Category.ParentCategory.Name / @Model.Category.Name</span>
+                        }
+                        else
+                        {
+                            <span>@Model.Category.Name</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Açıklama:</div>
+                <div class="col-md-8">@(Model.Description ?? "-")</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Liste Fiyatı:</div>
+                <div class="col-md-8">@Model.ListPrice.ToString("C")</div>
+            </div>
+            @if (Model.DiscountRate.HasValue && Model.DiscountRate.Value > 0)
+            {
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">İndirim Oranı:</div>
+                    <div class="col-md-8">
+                        <span class="badge bg-danger">%@Model.DiscountRate.Value</span>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">İndirimli Fiyat:</div>
+                    <div class="col-md-8 text-success fw-bold">@Model.DiscountedPrice?.ToString("C")</div>
+                </div>
+            }
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Stok Miktarı:</div>
+                <div class="col-md-8">@Model.StockQuantity</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Renk:</div>
+                <div class="col-md-8">@(Model.Color ?? "-")</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Mevcut Numaralar:</div>
+                <div class="col-md-8">@(Model.AvailableSizes ?? "-")</div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="row mb-2">
+                    <div class="col-md-4 fw-bold">Ürün Görseli:</div>
+                    <div class="col-md-8">
+                        <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 200px; max-height: 200px;" class="img-thumbnail" />
+                    </div>
+                </div>
+            }
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Durum:</div>
+                <div class="col-md-8">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Aktif</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Pasif</span>
+                    }
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-4 fw-bold">Oluşturma Tarihi:</div>
+                <div class="col-md-8">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</div>
+            </div>
+        </div>
+
+        <form method="post" asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-danger form-control">
+                        <i class="bi bi-trash"></i> Sil
+                    </button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-secondary border form-control">
+                        İptal
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

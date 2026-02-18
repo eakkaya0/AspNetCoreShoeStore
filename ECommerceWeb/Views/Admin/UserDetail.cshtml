@@ -1,0 +1,204 @@
+@model UserDetailViewModel
+
+@{
+    ViewData["Title"] = "Kullanıcı Detayı ve Rol Yönetimi";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>
+                <i class="bi bi-person-badge"></i> Kullanıcı Detayı
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Geri Dön
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Kullanıcı Bilgileri -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Kişisel Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Kullanıcı Adı</label>
+                            <p class="h6">@Model.UserName</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">E-posta</label>
+                            <p class="h6">@Model.Email</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Ad</label>
+                            <p class="h6">@Model.FirstName</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Soyad</label>
+                            <p class="h6">@Model.LastName</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Katılma Tarihi</label>
+                            <p class="h6">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">E-posta Durum</label>
+                            @if (Model.EmailConfirmed)
+                            {
+                                <p class="h6">
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle"></i> Doğrulı
+                                    </span>
+                                </p>
+                            }
+                            else
+                            {
+                                <form asp-action="ConfirmUserEmail" asp-route-userId="@Model.Id" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-exclamation-circle"></i> Doğrula
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rol Yönetimi -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Rol Atama</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AssignRoles" asp-route-userId="@Model.Id" method="post">
+                        <div class="row">
+                            @foreach (var role in Model.Roles)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               id="role_@role.RoleId" 
+                                               name="selectedRoles" 
+                                               value="@role.RoleName"
+                                               @(role.IsSelected ? "checked" : "")>
+                                        <label class="form-check-label" for="role_@role.RoleId">
+                                            @role.RoleName
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Rolleri Kaydet
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- İşlemler -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">İşlemler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                            <i class="bi bi-key"></i> Şifreyi Sıfırla
+                        </button>
+                    </div>
+                    @if (!Model.Roles.Any(r => r.IsSelected && r.RoleName == "Admin"))
+                    {
+                        <form asp-action="DeleteUser" asp-route-userId="@Model.Id" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" 
+                                    onclick="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?');">
+                                <i class="bi bi-trash"></i> Kullanıcıyı Sil
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted small">Admin kullanıcılar silinemez.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Bilgi Paneli -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Roller:</strong> Bu kullanıcıya atanabilecek sistem rollerini seçin.
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Dikkat:</strong> Şifre sıfırlama işlemi geri alınamaz.
+                    </div>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-octagon"></i>
+                        <strong>Silme:</strong> Admin kullanıcıları silinemez.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Şifre Sıfırlama Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Şifreyi Sıfırla</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ResetPassword" asp-route-userId="@Model.Id" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Yeni Şifre</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required 
+                               placeholder="Yeni şifreyi girin" minlength="6">
+                        <small class="form-text text-muted">Minimum 6 karakter, bir küçük harf ve bir sayı gereklidir.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-warning">Şifreyi Sıfırla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('newPassword')?.addEventListener('input', function (e) {
+            const password = e.target.value;
+            // Simple validation: at least 6 chars, with lowercase and digit
+            const isValid = password.length >= 6 && /[a-z]/.test(password) && /[0-9]/.test(password);
+
+            if (isValid) {
+                e.target.classList.remove('is-invalid');
+                e.target.classList.add('is-valid');
+            } else if (password.length > 0) {
+                e.target.classList.remove('is-valid');
+                e.target.classList.add('is-invalid');
+            }
+        });
+    </script>
+}

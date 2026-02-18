@@ -1,0 +1,152 @@
+@model ECommerce.Models.Models.Order
+@{
+    ViewData["Title"] = "Sipariş Başarılı";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <!-- Başarı İkonu -->
+                    <div class="mb-4">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Başlık -->
+                    <h2 class="text-success mb-3">Siparişiniz Başarıyla Alındı!</h2>
+                    <p class="text-muted mb-4">
+                        Sipariş numaranız: <strong>@Model.OrderNumber</strong>
+                    </p>
+
+                    <!-- Sipariş Bilgileri -->
+                    <div class="alert alert-info text-start">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> Sipariş Bilgileri
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                                <p class="mb-1"><strong>Durum:</strong> 
+                                    <span class="badge bg-warning text-dark">@Model.Status</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Toplam Tutar:</strong> ₺@Model.GrandTotal.ToString("F2")</p>
+                                <p class="mb-1"><strong>Ödeme Durumu:</strong> 
+                                    <span class="badge bg-success">@(Model.IsPaid ? "Ödendi" : "Bekliyor")</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Müşteri Bilgileri -->
+                    <div class="alert alert-light text-start">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-user"></i> Müşteri Bilgileri
+                        </h6>
+                        @if (Model.IsGuestOrder)
+                        {
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Ad Soyad:</strong> @Model.GuestFirstName @Model.GuestLastName</p>
+                                    <p class="mb-1"><strong>E-posta:</strong> @Model.GuestEmail</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Telefon:</strong> @Model.GuestPhone</p>
+                                    <p class="mb-1"><strong>Şehir:</strong> @Model.GuestCity</p>
+                                </div>
+                            </div>
+                            <p class="mb-1"><strong>Adres:</strong> @Model.GuestAddress</p>
+                        }
+                        else
+                        {
+                            <p class="mb-1"><strong>Kullanıcı:</strong> @Model.ApplicationUser?.FirstName @Model.ApplicationUser?.LastName</p>
+                            <p class="mb-1"><strong>E-posta:</strong> @Model.ApplicationUser?.Email</p>
+                        }
+                    </div>
+
+                    <!-- Sipariş Ürünleri -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-box"></i> Sipariş Edilen Ürünler
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var item in Model.OrderItems)
+                            {
+                                <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(item.Product.ImageUrl ?? "/images/placeholder-product.jpg")" 
+                                             alt="@item.Product.Name" 
+                                             class="rounded me-3" 
+                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-1">@item.Product.Name</h6>
+                                            @if (item.ProductVariant != null)
+                                            {
+                                                <small class="text-muted">Beden: @item.ProductVariant.Size</small>
+                                                <br>
+                                            }
+                                            <small class="text-muted">@item.Quantity Adet x ₺@item.UnitPrice.ToString("F2")</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong>₺@item.TotalPrice.ToString("F2")</strong>
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-0">Genel Toplam:</h5>
+                                <h5 class="mb-0 text-primary">₺@Model.GrandTotal.ToString("F2")</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Butonlar -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Alışverişe Devam Et
+                        </a>
+                        @if (!Model.IsGuestOrder)
+                        {
+                            <a href="/Account/Orders" class="btn btn-outline-secondary">
+                                <i class="fas fa-list"></i> Siparişlerim
+                            </a>
+                        }
+                    </div>
+
+                    <!-- Bilgilendirme -->
+                    <div class="alert alert-light mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-envelope"></i> 
+                            Siparişinizle ilgili detaylı bilgi e-posta adresinize gönderilmiştir.
+                            Sipariş durumunuzu takip edebilirsiniz.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-icon {
+        animation: scaleIn 0.5s ease-in-out;
+    }
+    
+    @@keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>

@@ -1,0 +1,204 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+/* FULL WIDTH WRAPPER */
+.slider-wrapper{
+    width:100vw;
+    margin-left:calc(-50vw + 50%);
+}
+
+/* FIXED HEIGHT */
+.slider-fixed{
+    height:500px;
+    position:relative;
+}
+
+/* carousel item full height */
+.slider-fixed .carousel-inner,
+.slider-fixed .carousel-item{
+    height:100%;
+}
+
+/* IMAGE CONTAINER */
+.slider-img{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+.slider-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* CAPTION STYLE */
+.slider-fixed .carousel-caption{
+    bottom:20%;
+}
+
+.slider-fixed h2{
+    font-weight:800;
+    text-shadow:0 3px 15px rgba(0,0,0,.5);
+}
+
+.slider-fixed p{
+    font-weight:500;
+    text-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .slider-fixed{
+        height:220px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   E-TİCARET ÜRÜN KARTLARI & ANA SAYFA
+══════════════════════════════════════════════════════════════ */
+
+.home-page {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.product-section .section-title {
+  font-weight: 700;
+  color: #1a1a2e;
+  border-bottom: 2px solid #0d6efd;
+  padding-bottom: 0.35rem;
+  display: inline-block;
+}
+
+/* Ürün kartı */
+.product-card {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.product-card-image-wrap {
+  position: relative;
+  background: #f8f9fa;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.product-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.product-card:hover .product-card-img {
+  transform: scale(1.05);
+}
+
+.product-card-no-image {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 0.875rem;
+  background: #e9ecef;
+}
+
+/* Rozetler */
+.product-badge {
+  position: absolute;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+.product-badge-discount {
+  top: 0.5rem;
+  left: 0.5rem;
+  background: #dc3545;
+  color: #fff;
+}
+
+.product-badge-out {
+  background: #6c757d;
+  color: #fff;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.product-card-title {
+  font-size: 0.95rem;
+  min-height: 2.5em;
+}
+
+.product-card-actions .btn {
+  font-size: 0.8rem;
+}
+
+/* Kategori filtresi alanı */
+.category-filter-wrapper {
+  background: #f8f9fa;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+/* Ürün detay sayfası */
+.product-detail-image-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  max-height: 480px;
+}
+
+.product-detail-image-wrap img {
+  object-fit: contain;
+}
+
+/* Adet input: sadece +/- butonları, tarayıcı spinner yok */
+#productQuantity::-webkit-outer-spin-button,
+#productQuantity::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#productQuantity {
+  -moz-appearance: textfield;
+}

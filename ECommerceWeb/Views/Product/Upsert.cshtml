@@ -1,0 +1,286 @@
+@model ECommerce.Models.ViewModels.ProductVM
+
+@{
+    bool isEdit = Model.Product.Id != 0;
+    string title = isEdit ? "Ürün Düzenle" : "Yeni Ürün Ekle";
+    string buttonText = isEdit ? "Güncelle" : "Kaydet";
+}
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">@title</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" asp-action="Upsert" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Product.Id" />
+            <input type="hidden" asp-for="Product.ImageUrl" />
+            <input type="hidden" asp-for="Product.CreatedDate" />
+            <input type="hidden" asp-for="Product.IsDeleted" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Ürün Bilgileri -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Product.Name" class="form-label"></label>
+                    <input asp-for="Product.Name" class="form-control" />
+                    <span asp-validation-for="Product.Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Product.Brand" class="form-label"></label>
+                    <input asp-for="Product.Brand" class="form-control" />
+                    <span asp-validation-for="Product.Brand" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Açıklama -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label asp-for="Product.Description" class="form-label"></label>
+                    <textarea id="tiny" asp-for="Product.Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Product.Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Kategori Seçimi (Alt Kategori - Ana/Alt formatında listelenir) -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label asp-for="Product.CategoryId" class="form-label">Kategori (Ana / Alt Kategori)</label>
+                    <select asp-for="Product.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                        <option value="">-- Alt kategori seçiniz (örn: Erkek / Spor) --</option>
+                    </select>
+                    <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                    <small class="text-muted">Ürün mutlaka bir alt kategoriye bağlanmalıdır. Ana kategori seçilemez.</small>
+                </div>
+            </div>
+
+            <!-- Fiyatlandırma -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Product.ListPrice" class="form-label"></label>
+                    <input asp-for="Product.ListPrice" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Product.ListPrice" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Product.DiscountRate" class="form-label"></label>
+                    <input asp-for="Product.DiscountRate" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Product.DiscountRate" class="text-danger"></span>
+                    <small class="text-muted">İndirim yoksa boş bırakabilirsiniz</small>
+                </div>
+            </div>
+
+            <!-- Renk -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label asp-for="Product.Color" class="form-label"></label>
+                    <input asp-for="Product.Color" class="form-control" />
+                </div>
+            </div>
+
+            <!-- Beden bazlı stok (yeni yapı) -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">Beden bazlı stok</label>
+                    <p class="text-muted small">Her beden için ayrı stok girin. Müşteri tarafında beden seçimi ve stok buna göre gösterilir.</p>
+
+                    <div class="row mb-2">
+                        <div class="col-auto">
+                            <label class="form-label small mb-0">Hızlı ekle</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="quickSizes" class="form-control" placeholder="36,37,38,39,40" />
+                                <span class="input-group-text">her birine stok</span>
+                                <input type="number" id="quickStock" class="form-control" value="10" min="0" style="max-width:80px;" />
+                                <button type="button" class="btn btn-outline-secondary" id="btnQuickAdd">Ekle</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="variantsTable">
+                            <thead>
+                                <tr>
+                                    <th>Beden</th>
+                                    <th style="width:120px;">Stok</th>
+                                    <th style="width:50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="variantsBody">
+                                @for (var i = 0; i < Model.Variants.Count; i++)
+                                {
+                                    <tr class="variant-row">
+                                        <td>
+                                            <input type="hidden" asp-for="Variants[i].VariantId" />
+                                            <input asp-for="Variants[i].Size" class="form-control form-control-sm" placeholder="36" />
+                                        </td>
+                                        <td>
+                                            <input asp-for="Variants[i].StockQuantity" type="number" min="0" class="form-control form-control-sm" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-variant" title="Satırı sil">×</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddVariant"><i class="bi bi-plus"></i> Beden ekle</button>
+
+                    <div class="mt-3">
+                        <details class="small">
+                            <summary class="text-muted">Veya genel stok (beden kullanmayacaksanız)</summary>
+                            <div class="row mt-2">
+                                <div class="col-md-6">
+                                    <label asp-for="Product.StockQuantity" class="form-label small"></label>
+                                    <input asp-for="Product.StockQuantity" type="number" min="0" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Product.AvailableSizes" class="form-label small"></label>
+                                    <input asp-for="Product.AvailableSizes" class="form-control form-control-sm" placeholder="36,37,38,39,40" />
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ana görsel (vitrin) -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label asp-for="ImageFile" class="form-label"></label>
+                    <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                    @if (!string.IsNullOrEmpty(Model.Product.ImageUrl))
+                    {
+                        <div class="mt-2">
+                            <img src="@Model.Product.ImageUrl" alt="Ana görsel" style="max-width: 200px; max-height: 200px;" class="img-thumbnail" />
+                            <p class="text-muted small">Mevcut ana görsel (yeni yüklerseniz değişir)</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Detay sayfası galerisi (en fazla 3 görsel) -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">Detay sayfası görselleri (en fazla 3)</label>
+                    <p class="text-muted small">Müşteri ürün detayında bu görseller galeri olarak görünür. 1, 2 veya 3 görsel yükleyebilirsiniz.</p>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label small">Görsel 1</label>
+                            <input type="file" name="GalleryFiles" class="form-control form-control-sm" accept="image/*" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Görsel 2</label>
+                            <input type="file" name="GalleryFiles" class="form-control form-control-sm" accept="image/*" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Görsel 3</label>
+                            <input type="file" name="GalleryFiles" class="form-control form-control-sm" accept="image/*" />
+                        </div>
+                    </div>
+                    @if (Model.Product.ProductImages?.Any() == true)
+                    {
+                        <div class="mt-2 d-flex gap-2 flex-wrap">
+                            @foreach (var img in Model.Product.ProductImages!.OrderBy(i => i.DisplayOrder))
+                            {
+                                <div>
+                                    <img src="@img.ImageUrl" alt="Galeri" style="max-width:100px;max-height:100px;object-fit:cover;" class="img-thumbnail" />
+                                </div>
+                            }
+                            <p class="text-muted small align-self-end">Mevcut galeri. Yeni görsel yüklerseniz tamamı değişir.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Durum -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input asp-for="Product.IsActive" class="form-check-input" type="checkbox" />
+                        <label asp-for="Product.IsActive" class="form-check-label"></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="row">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary form-control">
+                        <i class="bi bi-save"></i> @buttonText
+                    </button>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-secondary border form-control">
+                        İptal
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        tinymce.init({ selector: 'textarea#tiny' });
+    </script>
+    <script>
+        (function () {
+            var tbody = document.getElementById('variantsBody');
+            var btnAdd = document.getElementById('btnAddVariant');
+            var btnQuickAdd = document.getElementById('btnQuickAdd');
+            var quickSizes = document.getElementById('quickSizes');
+            var quickStock = document.getElementById('quickStock');
+
+            function getNextIndex() {
+                return tbody.querySelectorAll('tr.variant-row').length;
+            }
+
+            function addRow(size, stock) {
+                var i = getNextIndex();
+                var tr = document.createElement('tr');
+                tr.className = 'variant-row';
+                tr.innerHTML =
+                    '<td><input type="hidden" name="Variants[' + i + '].VariantId" value="0" />' +
+                    '<input type="text" name="Variants[' + i + '].Size" class="form-control form-control-sm" placeholder="36" value="' + (size || '') + '" /></td>' +
+                    '<td><input type="number" name="Variants[' + i + '].StockQuantity" min="0" class="form-control form-control-sm" value="' + (stock || 0) + '" /></td>' +
+                    '<td><button type="button" class="btn btn-outline-danger btn-sm remove-variant" title="Satırı sil">×</button></td>';
+                tbody.appendChild(tr);
+                tr.querySelector('.remove-variant').addEventListener('click', function () { tr.remove(); reindexRows(); });
+            }
+
+            function reindexRows() {
+                var rows = tbody.querySelectorAll('tr.variant-row');
+                rows.forEach(function (row, idx) {
+                    row.querySelector('input[name*=".VariantId"]').setAttribute('name', 'Variants[' + idx + '].VariantId');
+                    row.querySelector('input[name*=".Size"]').setAttribute('name', 'Variants[' + idx + '].Size');
+                    row.querySelector('input[name*=".StockQuantity"]').setAttribute('name', 'Variants[' + idx + '].StockQuantity');
+                });
+            }
+
+            if (btnAdd) {
+                btnAdd.addEventListener('click', function () { addRow('', 0); });
+            }
+
+            if (btnQuickAdd && quickSizes && quickStock) {
+                btnQuickAdd.addEventListener('click', function () {
+                    var sizes = (quickSizes.value || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+                    var stock = parseInt(quickStock.value, 10) || 0;
+                    sizes.forEach(function (size) { addRow(size, stock); });
+                });
+            }
+
+            tbody.querySelectorAll('.remove-variant').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    this.closest('tr').remove();
+                    reindexRows();
+                });
+            });
+        })();
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,57 @@
+@model ECommerce.Models.Models.Category
+
+@{
+ViewData["Title"] = "Kategori Ekle";
+}
+
+
+
+<form asp-action="Create" method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Yeni Kategori Ekle</h2>
+            <hr>
+        </div>
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="mb-3 row ">
+            <label asp-for="Name" class="form-label">Kategori Adı</label>
+            <input asp-for="Name" class="form-control" />
+           
+        </div>
+
+        <div class="mb-3 row">
+            <label asp-for="DisplayOrder" class="form-label">Sıra</label>
+            <input asp-for="DisplayOrder" type="number" class="form-control" />
+        </div>
+
+        <div class="mb-3 form-check row ">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label">Aktif mi?</label>
+        </div>
+
+        <div class="mb-3 row p-3">
+            <label asp-for="ParentCategoryId" class="form-label">Üst Kategori</label>
+            <select asp-for="ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategories">
+                <option value="">Ana Kategori</option>
+            </select>
+        </div>
+        
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Kaydet</button>
+            </div>
+             <div class="col-6  col-md-3">
+                  <a asp-controller="Category" asp-action="Index" class="btn btn-secondary border form-control">İptal</a>
+            </div>
+        </div>
+       
+      
+
+
+    </div>
+
+</form>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,274 @@
+@model ECommerce.Models.Models.Order
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Sipariş Yönetimi</a></li>
+                    <li class="breadcrumb-item active">Sipariş Detayı</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt"></i> Sipariş Bilgileri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Sipariş No:</strong> @Model.OrderNumber</p>
+                            <p><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p><strong>Durum:</strong> 
+                                <span class="badge bg-@GetStatusColor(Model.Status)">
+                                    @GetStatusText(Model.Status)
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Toplam Tutar:</strong> ₺@Model.GrandTotal.ToString("F2")</p>
+                            <p><strong>Kargo:</strong> @(Model.ShippingCost == 0 ? "Ücretsiz" : "₺" + Model.ShippingCost.ToString("F2"))</p>
+                            <p><strong>Ödeme Durumu:</strong> 
+                                <span class="badge bg-@(Model.IsPaid ? "success" : "warning")">
+                                    @(Model.IsPaid ? "Ödendi" : "Bekliyor")
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="mb-3">Müşteri Bilgileri</h6>
+                            @if (Model.IsGuestOrder)
+                            {
+                                <div class="alert alert-info">
+                                    <p><strong>Ad Soyad:</strong> @Model.GuestFirstName @Model.GuestLastName</p>
+                                    <p><strong>E-posta:</strong> @Model.GuestEmail</p>
+                                    <p><strong>Telefon:</strong> @Model.GuestPhone</p>
+                                    <p><strong>Şehir:</strong> @Model.GuestCity</p>
+                                    <p><strong>Adres:</strong> @Model.GuestAddress</p>
+                                    @if (!string.IsNullOrEmpty(Model.GuestNotes))
+                                    {
+                                        <p><strong>Not:</strong> @Model.GuestNotes</p>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <p><strong>Ad Soyad:</strong> @Model.ApplicationUser?.FirstName @Model.ApplicationUser?.LastName</p>
+                                    <p><strong>E-posta:</strong> @Model.ApplicationUser?.Email</p>
+                                    <p><strong>Kayıt Tarihi:</strong> @Model.ApplicationUser?.CreatedAt.ToString("dd.MM.yyyy")</p>
+
+                                    @if (!string.IsNullOrWhiteSpace(Model.GuestPhone))
+                                    {
+                                        <p><strong>Telefon:</strong> @Model.GuestPhone</p>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.GuestCity))
+                                    {
+                                        <p><strong>Şehir:</strong> @Model.GuestCity</p>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Model.GuestAddress))
+                                    {
+                                        <p><strong>Adres:</strong> @Model.GuestAddress</p>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.GuestNotes))
+                                    {
+                                        <p><strong>Not:</strong> @Model.GuestNotes</p>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-box"></i> Sipariş Edilen Ürünler
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.OrderItems)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <img src="@(item.Product.ImageUrl ?? "/images/placeholder-product.jpg")" 
+                                     alt="@item.Product.Name" 
+                                     class="rounded me-3" 
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h6 class="mb-1">@item.Product.Name</h6>
+                                    @if (item.ProductVariant != null)
+                                    {
+                                        <small class="text-muted">Beden: @item.ProductVariant.Size</small>
+                                        <br>
+                                    }
+                                    <small class="text-muted">@item.Quantity Adet x ₺@item.UnitPrice.ToString("F2")</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <strong>₺@item.TotalPrice.ToString("F2")</strong>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-cogs"></i> Yönetim İşlemleri
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle w-100" 
+                                data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i> Durumu Güncelle
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li>
+                                <button type="button" class="dropdown-item" 
+                                        onclick="updateOrderStatus(@Model.Id, 'Confirmed')">
+                                    <i class="fas fa-check"></i> Onayla
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item" 
+                                        onclick="updateOrderStatus(@Model.Id, 'Preparing')">
+                                    <i class="fas fa-box"></i> Hazırlanıyor
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item" 
+                                        onclick="updateOrderStatus(@Model.Id, 'Shipped')">
+                                    <i class="fas fa-truck"></i> Kargoya Ver
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item" 
+                                        onclick="updateOrderStatus(@Model.Id, 'Delivered')">
+                                    <i class="fas fa-check-circle"></i> Teslim Edildi
+                                </button>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item text-danger" 
+                                        onclick="cancelOrder(@Model.Id)">
+                                    <i class="fas fa-times"></i> İptal Et
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left"></i> Listeye Geri Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateOrderStatus(orderId, status) {
+            if (confirm('Sipariş durumunu güncellemek istediğinize emin misiniz?')) {
+                fetch('/AdminOrder/UpdateStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `id=${orderId}&status=${status}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu.');
+                });
+            }
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Siparişi iptal etmek istediğinize emin misiniz?')) {
+                fetch('/AdminOrder/CancelOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `id=${orderId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu.');
+                });
+            }
+        }
+    </script>
+}
+
+@functions {
+    private string GetStatusText(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => "Beklemede",
+            OrderStatus.Confirmed => "Onaylandı",
+            OrderStatus.Preparing => "Hazırlanıyor",
+            OrderStatus.Shipped => "Kargoda",
+            OrderStatus.Delivered => "Teslim Edildi",
+            OrderStatus.Cancelled => "İptal Edildi",
+            OrderStatus.Refunded => "İade Edildi",
+            _ => "Bilinmeyen"
+        };
+    }
+
+    private string GetStatusColor(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => "warning",
+            OrderStatus.Confirmed => "info",
+            OrderStatus.Preparing => "primary",
+            OrderStatus.Shipped => "success",
+            OrderStatus.Delivered => "success",
+            OrderStatus.Cancelled => "danger",
+            OrderStatus.Refunded => "secondary",
+            _ => "secondary"
+        };
+    }
+}

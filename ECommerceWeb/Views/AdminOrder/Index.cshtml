@@ -1,0 +1,184 @@
+@model IEnumerable<ECommerce.Models.ViewModels.OrderSummaryVM>
+@{
+    ViewData["Title"] = "Sipariş Yönetimi";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-clipboard-list"></i> Sipariş Yönetimi
+            </h2>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-box fa-3x mb-3"></i>
+                    <h4>Henüz sipariş bulunmuyor</h4>
+                    <p class="mb-3">Sistemde henüz sipariş kaydı bulunmamaktadır.</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sipariş No</th>
+                                        <th>Müşteri</th>
+                                        <th>E-posta</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                        <th>Toplam</th>
+                                        <th>Ödeme</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@order.OrderNumber</strong>
+                                            </td>
+                                            <td>@order.CustomerName</td>
+                                            <td>@order.CustomerEmail</td>
+                                            <td>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>
+                                                <span class="badge bg-@order.StatusColor">
+                                                    @order.StatusText
+                                                </span>
+                                            </td>
+                                            <td><strong>₺@order.GrandTotal.ToString("F2")</strong></td>
+                                            <td>
+                                                @if (order.IsPaid)
+                                                {
+                                                    <span class="badge bg-success">Ödendi</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">Bekliyor</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Details", new { id = order.Id })" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i> Detay
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                            data-bs-toggle="dropdown">
+                                                        <i class="fas fa-cog"></i> Durum
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <button type="button" class="dropdown-item" 
+                                                                    onclick="updateOrderStatus(@order.Id, 'Confirmed')">
+                                                                <i class="fas fa-check"></i> Onayla
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item" 
+                                                                    onclick="updateOrderStatus(@order.Id, 'Preparing')">
+                                                                <i class="fas fa-box"></i> Hazırlanıyor
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item" 
+                                                                    onclick="updateOrderStatus(@order.Id, 'Shipped')">
+                                                                <i class="fas fa-truck"></i> Kargoya Ver
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item" 
+                                                                    onclick="updateOrderStatus(@order.Id, 'Delivered')">
+                                                                <i class="fas fa-check-circle"></i> Teslim Edildi
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <hr class="dropdown-divider">
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" class="dropdown-item text-danger" 
+                                                                    onclick="cancelOrder(@order.Id)">
+                                                                <i class="fas fa-times"></i> İptal Et
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateOrderStatus(orderId, status) {
+            if (confirm('Sipariş durumunu güncellemek istediğinize emin misiniz?')) {
+                fetch('/AdminOrder/UpdateStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `id=${orderId}&status=${status}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu.');
+                });
+            }
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Siparişi iptal etmek istediğinize emin misiniz?')) {
+                fetch('/AdminOrder/CancelOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `id=${orderId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Hata: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Bir hata oluştu.');
+                });
+            }
+        }
+    </script>
+}

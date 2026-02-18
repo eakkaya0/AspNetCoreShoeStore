@@ -1,0 +1,210 @@
+@using ECommerce.Models.ViewModels
+@model HomeVM
+
+@{
+    var hasSearchOrFilters = !string.IsNullOrWhiteSpace(Model.SearchTerm) ||
+                             Model.MinPrice.HasValue ||
+                             Model.MaxPrice.HasValue ||
+                             !string.IsNullOrWhiteSpace(Model.SelectedBrand) ||
+                             Model.InStockOnly == true;
+}
+
+<div class="product-filter-search-container mb-4">
+    <form asp-controller="Home" asp-action="Index" method="get" id="filterSearchForm" class="row g-3">
+        
+        <!-- Hidden fields for category if selected -->
+        @if (Model.SelectedMainCategoryId.HasValue)
+        {
+            <input type="hidden" name="mainCategoryId" value="@Model.SelectedMainCategoryId" />
+        }
+        @if (Model.SelectedSubCategoryId.HasValue)
+        {
+            <input type="hidden" name="subCategoryId" value="@Model.SelectedSubCategoryId" />
+        }
+
+        <!-- Search Input -->
+        <div class="col-12 col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" 
+                       class="form-control" 
+                       name="searchTerm" 
+                       placeholder="Ürün, marka ara..." 
+                       value="@Model.SearchTerm" />
+            </div>
+        </div>
+
+        <!-- Min Price -->
+        <div class="col-6 col-md-2">
+            <label class="form-label small">Min Fiyat</label>
+            <input type="number" 
+                   class="form-control" 
+                   name="minPrice" 
+                   placeholder="₺0" 
+                   value="@(Model.MinPrice?.ToString() ?? "")"
+                   step="10"
+                   min="0" />
+        </div>
+
+        <!-- Max Price -->
+        <div class="col-6 col-md-2">
+            <label class="form-label small">Max Fiyat</label>
+            <input type="number" 
+                   class="form-control" 
+                   name="maxPrice" 
+                   placeholder="₺10000" 
+                   value="@(Model.MaxPrice?.ToString() ?? "")"
+                   step="10"
+                   min="0" />
+        </div>
+
+        <!-- Sort By -->
+        <div class="col-12 col-md-2">
+            <label class="form-label small">Sırala</label>
+            <select name="sortBy" class="form-select form-select-sm">
+                <option value="newest" selected="@(Model.SortBy == "newest" ? "selected" : "")">En Yeni</option>
+                <option value="price-asc" selected="@(Model.SortBy == "price-asc" ? "selected" : "")">Fiyat: Düşük → Yüksek</option>
+                <option value="price-desc" selected="@(Model.SortBy == "price-desc" ? "selected" : "")">Fiyat: Yüksek → Düşük</option>
+                <option value="discount" selected="@(Model.SortBy == "discount" ? "selected" : "")">İndirimli</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-sm w-100">
+                <i class="bi bi-funnel"></i> Filtrele
+            </button>
+        </div>
+
+        <!-- Additional Filters (Collapsible) -->
+        <div class="col-12">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" 
+                    data-bs-target="#advancedFilters" aria-expanded="false">
+                <i class="bi bi-sliders"></i> Gelişmiş Filtreler
+            </button>
+        </div>
+    </form>
+
+    <!-- Advanced Filters Collapse -->
+    <div class="collapse mt-3" id="advancedFilters">
+        <div class="card card-body">
+            <form asp-controller="Home" asp-action="Index" method="get" class="row g-3">
+                
+                <!-- Hidden fields for category if selected -->
+                @if (Model.SelectedMainCategoryId.HasValue)
+                {
+                    <input type="hidden" name="mainCategoryId" value="@Model.SelectedMainCategoryId" />
+                }
+                @if (Model.SelectedSubCategoryId.HasValue)
+                {
+                    <input type="hidden" name="subCategoryId" value="@Model.SelectedSubCategoryId" />
+                }
+
+                <!-- Brand Filter -->
+                @if (Model.AvailableBrands != null && Model.AvailableBrands.Any())
+                {
+                    <div class="col-md-4">
+                        <label class="form-label">Marka</label>
+                        <select name="brand" class="form-select">
+                            <option value="">Tüm Markalar</option>
+                            @foreach (var b in Model.AvailableBrands)
+                            {
+                                <option value="@b" selected="@(Model.SelectedBrand == b ? "selected" : "")">@b</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <!-- Stock Filter -->
+                <div class="col-md-4">
+                    <label class="form-label">Stok Durumu</label>
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               name="inStockOnly" 
+                               value="true" 
+                               id="inStockCheckbox"
+                               checked="@(Model.InStockOnly == true ? "checked" : "")" />
+                        <label class="form-check-label" for="inStockCheckbox">
+                            Sadece stokta olanlar
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Apply Filters Button -->
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success btn-sm w-100">
+                        <i class="bi bi-check-circle"></i> Uygula
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Filters Display -->
+    @if (hasSearchOrFilters)
+    {
+        <div class="active-filters mt-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <small class="text-muted">Aktif Filtreler:</small>
+                
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <span class="badge bg-info text-dark">
+                        Arama: <strong>@Model.SearchTerm</strong>
+                        <a href="@Url.Action("Index", "Home", new { mainCategoryId = Model.SelectedMainCategoryId, subCategoryId = Model.SelectedSubCategoryId })" 
+                           class="ms-1">✕</a>
+                    </span>
+                }
+
+                @if (Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+                {
+                    <span class="badge bg-info text-dark">
+                        Fiyat: ₺@(Model.MinPrice?.ToString() ?? "0") - ₺@(Model.MaxPrice?.ToString() ?? "∞")
+                        <a href="@Url.Action("Index", "Home", new { mainCategoryId = Model.SelectedMainCategoryId, subCategoryId = Model.SelectedSubCategoryId, searchTerm = Model.SearchTerm, brand = Model.SelectedBrand, inStockOnly = false, sortBy = Model.SortBy })" 
+                           class="ms-1">✕</a>
+                    </span>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.SelectedBrand))
+                {
+                    <span class="badge bg-info text-dark">
+                        Marka: <strong>@Model.SelectedBrand</strong>
+                        <a href="@Url.Action("Index", "Home", new { mainCategoryId = Model.SelectedMainCategoryId, subCategoryId = Model.SelectedSubCategoryId, searchTerm = Model.SearchTerm, inStockOnly = false, sortBy = Model.SortBy })" 
+                           class="ms-1">✕</a>
+                    </span>
+                }
+
+                @if (Model.InStockOnly == true)
+                {
+                    <span class="badge bg-info text-dark">
+                        Stokta Olanlar
+                        <a href="@Url.Action("Index", "Home", new { mainCategoryId = Model.SelectedMainCategoryId, subCategoryId = Model.SelectedSubCategoryId, searchTerm = Model.SearchTerm, brand = Model.SelectedBrand, inStockOnly = false, sortBy = Model.SortBy })" 
+                           class="ms-1">✕</a>
+                    </span>
+                }
+
+                <a href="@Url.Action("Index", "Home")" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-x-circle"></i> Filtreleri Temizle
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Results Count -->
+    @if (hasSearchOrFilters || Model.SelectedMainCategoryId.HasValue || Model.SelectedSubCategoryId.HasValue)
+    {
+        <div class="results-info mt-2">
+            <small class="text-muted">
+                @if (hasSearchOrFilters)
+                {
+                    <span><strong>@Model.TotalProducts</strong> ürün bulundu</span>
+                }
+                else
+                {
+                    <span><strong>@Model.FilteredProducts.Count()</strong> ürün</span>
+                }
+            </small>
+        </div>
+    }
+</div>
