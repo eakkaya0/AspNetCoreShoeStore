@@ -1,6 +1,6 @@
 # E-Commerce Platform
 
-![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
+![.NET](https://img.shields.io/badge/.NET-9.0-purple.svg)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-9.0-blue.svg)
 ![Entity Framework Core](https://img.shields.io/badge/EF%20Core-9.0-green.svg)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-red.svg)
