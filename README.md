@@ -290,7 +290,7 @@ https://localhost:7123
 
 <img width="1918" height="967" alt="tumurunler" src="https://github.com/user-attachments/assets/cfdedda5-c50f-45ec-9f48-fb5f6667b1d9" />
 
-<img width="1918" height="962" alt="kategori" src="https://github.com/user-attachments/assets/9a64e15b-75c7-4d4b-bc9c-108688a137ee" />
+
 
 
 
@@ -324,6 +324,8 @@ https://localhost:7123
 <img width="1911" height="963" alt="üründüzenleme2" src="https://github.com/user-attachments/assets/ee8ede11-634a-4339-a8c8-5b9a43ebdd60" />
 
 <img width="1917" height="953" alt="üründüzenleme3" src="https://github.com/user-attachments/assets/390d576f-9ee4-4528-a3cc-5abbaa15d0f2" />
+
+<img width="1918" height="962" alt="kategori" src="https://github.com/user-attachments/assets/9a64e15b-75c7-4d4b-bc9c-108688a137ee" />
 
 
 
