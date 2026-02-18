@@ -1,6 +1,37 @@
+# Build folders
 bin/
 obj/
+out/
+
+# Visual Studio
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
 appsettings.Development.json
+
+# Node
+node_modules/
+
+# Publish
+publish/
+
+# Packages
+**/packages/*
+!**/packages/build/
+
+# Coverage
+coverage*
+*.coverage
+*.coveragexml
