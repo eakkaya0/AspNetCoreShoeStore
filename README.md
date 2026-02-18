@@ -276,43 +276,80 @@ https://localhost:7123
 
 ### Ana Sayfa
 <!-- Ana sayfa ekran görüntüsü buraya eklenecek -->
-![Ana Sayfa](screenshots/homepage.png)
+<img width="1918" height="916" alt="anasayfa" src="https://github.com/user-attachments/assets/5cc55b6e-4830-4112-91fc-38951324248a" />
+
+
 
 ### Ürün Listesi
 <!-- Ürün listesi ekran görüntüsü buraya eklenecek -->
-![Ürün Listesi](screenshots/product-list.png)
+<img width="1902" height="827" alt="yeniürünler" src="https://github.com/user-attachments/assets/28c08674-a907-45f9-acfa-3679a1a45145" />
+
+<img width="1912" height="958" alt="inidirmliürünler" src="https://github.com/user-attachments/assets/98871584-3fd0-4a70-acb5-c7d4fd7a5ce2" />
+
+<img width="1918" height="972" alt="coksatanlar" src="https://github.com/user-attachments/assets/705fbd97-5ee4-47df-b9fa-f7c55cb26882" />
+
+<img width="1918" height="967" alt="tumurunler" src="https://github.com/user-attachments/assets/cfdedda5-c50f-45ec-9f48-fb5f6667b1d9" />
+
+
+
+
 
 ### Ürün Detayı
 <!-- Ürün detayı ekran görüntüsü buraya eklenecek -->
-![Ürün Detayı](screenshots/product-detail.png)
+<img width="1917" height="966" alt="urundetay" src="https://github.com/user-attachments/assets/569eda81-e7a1-4145-9d53-a3e0464a933b" />
+
+
 
 ### Sepet
 <!-- Sepet ekran görüntüsü buraya eklenecek -->
-![Sepet](screenshots/shopping-cart.png)
+<img width="1918" height="952" alt="sepet" src="https://github.com/user-attachments/assets/c43db180-f24e-42d4-8c90-15814efe2ecd" />
+
+
 
 ### Checkout
 <!-- Checkout ekran görüntüsü buraya eklenecek -->
-![Checkout](screenshots/checkout.png)
+<img width="1918" height="952" alt="checkout" src="https://github.com/user-attachments/assets/2cd64dc1-920a-43d0-ab08-2ad67407c4eb" />
 
-### Admin Dashboard
-<!-- Admin dashboard ekran görüntüsü buraya eklenecek -->
-![Admin Dashboard](screenshots/admin-dashboard.png)
+
 
 ### Ürün Yönetimi
 <!-- Ürün yönetimi ekran görüntüsü buraya eklenecek -->
-![Ürün Yönetimi](screenshots/product-management.png)
+<img width="1865" height="957" alt="adminürünlistesi" src="https://github.com/user-attachments/assets/b62aef77-14af-4c7c-8b85-46cc1a8ae6ab" />
+
+<img width="1918" height="953" alt="üründüzenleme1" src="https://github.com/user-attachments/assets/c481b84d-90d5-4d36-82d2-c8d013ad9d8c" />
+
+<img width="1911" height="963" alt="üründüzenleme2" src="https://github.com/user-attachments/assets/ee8ede11-634a-4339-a8c8-5b9a43ebdd60" />
+
+<img width="1917" height="953" alt="üründüzenleme3" src="https://github.com/user-attachments/assets/390d576f-9ee4-4528-a3cc-5abbaa15d0f2" />
+
+
+
+
+
 
 ### Sipariş Yönetimi
 <!-- Sipariş yönetimi ekran görüntüsü buraya eklenecek -->
-![Sipariş Yönetimi](screenshots/order-management.png)
+<img width="1917" height="988" alt="siparisyonetimi" src="https://github.com/user-attachments/assets/1fb1bbde-2d8e-4e8c-8299-bd617161fa6e" />
+
+<img width="1912" height="923" alt="siparisyonetimidetay" src="https://github.com/user-attachments/assets/5d264281-cf51-4b35-98ca-2f38b634905e" />
+
+
+
+
+
 
 ### Kullanıcı Yönetimi
 <!-- Kullanıcı yönetimi ekran görüntüsü buraya eklenecek -->
-![Kullanıcı Yönetimi](screenshots/user-management.png)
+<img width="1918" height="945" alt="kullanıcıyönetimiana" src="https://github.com/user-attachments/assets/a5b3fce6-1c63-4246-8e3e-2a2941bc0e02" />
+
+<img width="1912" height="953" alt="kullanıcıyönetimidetay" src="https://github.com/user-attachments/assets/3cce382d-17ce-46de-a8a5-f3f1c620824c" />
+
+
 
 ### Slider Yönetimi
 <!-- Slider yönetimi ekran görüntüsü buraya eklenecek -->
-![Slider Yönetimi](screenshots/slider-management.png)
+<img width="1918" height="957" alt="slieryönetimi" src="https://github.com/user-attachments/assets/41d5ac8d-b2f9-437f-9b96-f15a10262b91" />
+
 
 ## 🗄 Veritabanı Şeması
 
