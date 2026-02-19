@@ -136,8 +136,8 @@
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Ara Toplam (@Model.TotalItems ürün):</span>
-                            <strong>@Model.CartTotal.ToString("C2")</strong>
+                            <span>Ara Toplam (<span id="cartItemsCount">@Model.TotalItems</span> ürün):</span>
+                            <strong id="cartSubtotal">@Model.CartTotal.ToString("C2")</strong>
                         </div>
                         
                         <div class="d-flex justify-content-between mb-2">
@@ -158,7 +158,7 @@
 
                         <div class="d-flex justify-content-between mb-3">
                             <h5>Genel Toplam:</h5>
-                            <h4 class="text-primary">@Model.GrandTotal.ToString("C2")</h4>
+                            <h4 class="text-primary" id="cartGrandTotal">@Model.GrandTotal.ToString("C2")</h4>
                         </div>
 
                         @if (Model.CartItems.Any(item => !item.InStock || !item.HasEnoughStock))
@@ -362,23 +362,36 @@
 
             // Sepet toplamlarını güncelle
             function updateCartTotals(cartTotal, totalItems) {
-                // Ara toplam
-                $('.d-flex.justify-content-between span:contains("Ara Toplam")').next('strong').text(
-                    cartTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })
-                );
+                // Ara toplam güncelle
+                $('#cartSubtotal').text(cartTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }));
                 
-                // Genel toplam
-                $('.h4.text-primary').text(
-                    cartTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })
-                );
+                // Genel toplam güncelle (kargo dahil)
+                var shippingCost = parseFloat($('.d-flex.justify-content-between span:contains("Kargo")').next('strong').text().replace(/[^\d.,]/g, '')) || 0;
+                var grandTotal = cartTotal + shippingCost;
+                $('#cartGrandTotal').text(grandTotal.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' }));
                 
-                // Ürün sayısı
-                $('.badge').text(totalItems);
-                $('span:contains("ürün")').each(function() {
-                    if ($(this).text().includes('Sepet Ürünleri')) {
-                        $(this).text(`Sepet Ürünleri (${totalItems} ürün)`);
+                // Ürün sayısı güncelle
+                $('#cartItemsCount').text(totalItems);
+                
+                // Başlıktaki ürün sayısı
+                $('h2 span.badge').text(totalItems);
+                
+                // Sepet ürünleri başlığında ürün sayısı
+                $('.card-header h5').each(function() {
+                    var $h5 = $(this);
+                    var text = $h5.text();
+                    if (text.includes('Sepet Ürünleri')) {
+                        $h5.text('Sepet Ürünleri (' + totalItems + ' ürün)');
                     }
                 });
+                
+                // Navbar'daki sepet sayısı
+                $('.cart-count').text(totalItems);
+                if (totalItems > 0) {
+                    $('.cart-count').removeClass('d-none');
+                } else {
+                    $('.cart-count').addClass('d-none');
+                }
             }
 
             // Loading göster/gizle

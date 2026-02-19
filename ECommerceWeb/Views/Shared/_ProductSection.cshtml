@@ -46,12 +46,12 @@
                             <div class="product-price mt-auto">
                                 @if (product.DiscountedPrice.HasValue)
                                 {
-                                    <span class="fw-bold text-danger fs-6">@product.DiscountedPrice.Value.ToString("C")</span>
+                                    <span class="fw-bold text-danger fs-5">@product.DiscountedPrice.Value.ToString("C")</span>
                                     <small class="text-muted text-decoration-line-through d-block">@product.ListPrice.ToString("C")</small>
                                 }
                                 else
                                 {
-                                    <span class="fw-bold fs-6">@product.ListPrice.ToString("C")</span>
+                                    <span class="fw-bold fs-5">@product.ListPrice.ToString("C")</span>
                                 }
                             </div>
                             <div class="product-card-actions mt-2">

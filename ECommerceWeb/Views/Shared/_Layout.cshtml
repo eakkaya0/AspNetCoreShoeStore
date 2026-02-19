@@ -20,22 +20,33 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom "
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom"
             data-bs-theme="dark">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AYAKKABI FURYASI</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Her zaman görünür olan linkler -->
+                <div class="d-flex align-items-center">
+                    <a class="navbar-brand me-3" asp-area="" asp-controller="Home" asp-action="Index">AYAKKABI FURYASI</a>
+                    <div class="d-none d-lg-flex me-auto">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index" asp-fragment="tum-urunler">Tüm Ürünler</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Hamburger menü butonu -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index" asp-fragment="tum-urunler">Tüm Ürünler</a>
-                        </li>
+                
+                <!-- Collapsible menü -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
                         @if (User.IsInRole("Admin") || User.IsInRole("Employee"))
                         {
                             <li class="nav-item dropdown">
@@ -78,6 +89,7 @@
                             </li>
                         }
                     </ul>
+                    
                     <ul class="navbar-nav ms-auto">
                         <!-- Sepet Linki - Herkes görebilir -->
                         <li class="nav-item">
