@@ -206,6 +206,34 @@
     </div>
 </div>
 
+<!-- Sepet Boşaltma Modal -->
+<div class="modal fade" id="clearCartModal" tabindex="-1" aria-labelledby="clearCartModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="clearCartModalLabel">
+                    <i class="fas fa-shopping-cart text-warning me-2"></i>
+                    Sepeti Boşalt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                <h5>Sepetinizi tamamen boşaltmak istediğinizden emin misiniz?</h5>
+                <p class="text-muted mb-0">Bu işlem geri alınamaz ve tüm ürünler sepetinizden kaldırılacaktır.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> İptal
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmClearCart">
+                    <i class="fas fa-trash me-1"></i> Evet, Boşalt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         $(document).ready(function() {
@@ -279,13 +307,11 @@
 
             // Ürün silme
             $(document).on('click', '.remove-item', function() {
-                if (!confirm('Bu ürünü sepetten kaldırmak istediğinizden emin misiniz?')) {
-                    return;
-                }
-
                 var cartItemDiv = $(this).closest('.cart-item');
                 var cartItemId = cartItemDiv.data('cart-item-id');
                 var productId = cartItemDiv.data('product-id');
+                
+                console.log('RemoveFromCart - CartItemId:', cartItemId, 'ProductId:', productId);
                 
                 showLoading();
                 
@@ -301,6 +327,7 @@
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
                     success: function(response) {
+                        console.log('RemoveFromCart response:', response);
                         hideLoading();
                         if (response.success) {
                             // Sadece tıklanan ürünü kaldır
@@ -330,10 +357,13 @@
 
             // Sepeti boşalt
             $('#clearCartBtn').click(function() {
-                if (!confirm('Sepetinizi tamamen boşaltmak istediğinizden emin misiniz?')) {
-                    return;
-                }
+                // Modal'ı göster
+                $('#clearCartModal').modal('show');
+            });
 
+            // Modal'daki onay butonuna tıklandığında
+            $('#confirmClearCart').click(function() {
+                $('#clearCartModal').modal('hide');
                 showLoading();
                 
                 $.ajax({
@@ -347,9 +377,12 @@
                     success: function(response) {
                         hideLoading();
                         if (response.success) {
-                            location.reload();
+                            showNotification('Sepetiniz başarıyla boşaltıldı.', 'success');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
                         } else {
-                            showNotification(response.message, 'error');
+                            showNotification(response.message || 'Sepet boşaltılırken bir hata oluştu.', 'error');
                         }
                     },
                     error: function(xhr, status, error) {
@@ -405,18 +438,34 @@
 
             // Bildirim göster
             function showNotification(message, type) {
-                var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                var alertHtml = `
-                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index: 9999;">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                var toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+                var toastHtml = `
+                    <div class="toast position-fixed top-0 end-0 m-3" role="alert" style="z-index: 9999;" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header ${toastClass} text-white">
+                            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                            <strong class="me-auto">${type === 'success' ? 'Başarılı' : 'Hata'}</strong>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
                     </div>
                 `;
-                $('body').append(alertHtml);
                 
-                setTimeout(function() {
-                    $('.alert').alert('close');
-                }, 3000);
+                $('body').append(toastHtml);
+                
+                // Toast'ı göster
+                var toastElement = $('.toast').last();
+                var toast = new bootstrap.Toast(toastElement[0], {
+                    autohide: true,
+                    delay: 3000
+                });
+                toast.show();
+                
+                // Toast gizlendiğinde DOM'dan kaldır
+                toastElement.on('hidden.bs.toast', function () {
+                    $(this).remove();
+                });
             }
         });
     </script>

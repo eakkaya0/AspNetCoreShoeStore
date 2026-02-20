@@ -42,6 +42,33 @@ namespace ECommerceWeb.Controllers
             {
                 guestSessionId = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString("GuestSessionId", guestSessionId);
+                
+                // Cookie'e de kaydet (backup)
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddHours(24),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax,
+                    Secure = false
+                };
+                Response.Cookies.Append("GuestSessionId", guestSessionId, cookieOptions);
+                
+                Console.WriteLine($"Created new guest session ID: {guestSessionId}");
+            }
+            else
+            {
+                // Session'da yoksa cookie'den al
+                if (string.IsNullOrEmpty(HttpContext.Session.GetString("GuestSessionId")))
+                {
+                    var cookieSessionId = Request.Cookies["GuestSessionId"];
+                    if (!string.IsNullOrEmpty(cookieSessionId))
+                    {
+                        HttpContext.Session.SetString("GuestSessionId", cookieSessionId);
+                        guestSessionId = cookieSessionId;
+                    }
+                }
+                Console.WriteLine($"Using existing guest session ID: {guestSessionId}");
             }
             return guestSessionId;
         }
@@ -61,6 +88,9 @@ namespace ECommerceWeb.Controllers
             var userId = GetUserId();
             var isGuest = IsGuestUser();
             var guestSessionId = isGuest ? GetGuestSessionId() : string.Empty;
+
+            Console.WriteLine($"AddToCart - IsGuest: {isGuest}, UserId: {userId}, GuestSessionId: {guestSessionId}");
+            Console.WriteLine($"AddToCart - ProductId: {model.ProductId}, Quantity: {model.Quantity}");
 
             try
             {
@@ -165,18 +195,23 @@ namespace ECommerceWeb.Controllers
             var userId = GetUserId();
             var isGuest = IsGuestUser();
             
+            Console.WriteLine($"Index - IsGuest: {isGuest}, UserId: {userId}");
+            
             List<ShoppingCart> cartItems;
             
             if (isGuest)
             {
                 // Guest kullanıcılar için session bazlı sepet
                 var guestSessionId = GetGuestSessionId();
+                Console.WriteLine($"Index - Getting guest cart for session: {guestSessionId}");
                 cartItems = (await _unitOfWork.ShoppingCart.GetGuestCartAsync(guestSessionId)).ToList();
+                Console.WriteLine($"Index - Guest cart items count: {cartItems.Count}");
             }
             else
             {
                 // Kayıtlı kullanıcılar için user bazlı sepet
                 cartItems = (await _unitOfWork.ShoppingCart.GetUserCartAsync(userId)).ToList();
+                Console.WriteLine($"Index - User cart items count: {cartItems.Count}");
             }
             
             var cartVM = new ShoppingCartVM

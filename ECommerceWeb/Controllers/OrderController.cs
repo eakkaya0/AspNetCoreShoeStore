@@ -40,6 +40,33 @@ namespace ECommerceWeb.Controllers
             {
                 guestSessionId = Guid.NewGuid().ToString();
                 HttpContext.Session.SetString("GuestSessionId", guestSessionId);
+                
+                // Cookie'e de kaydet (backup)
+                var cookieOptions = new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddHours(24),
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax,
+                    Secure = false
+                };
+                Response.Cookies.Append("GuestSessionId", guestSessionId, cookieOptions);
+                
+                Console.WriteLine($"Created new guest session ID: {guestSessionId}");
+            }
+            else
+            {
+                // Session'da yoksa cookie'den al
+                if (string.IsNullOrEmpty(HttpContext.Session.GetString("GuestSessionId")))
+                {
+                    var cookieSessionId = Request.Cookies["GuestSessionId"];
+                    if (!string.IsNullOrEmpty(cookieSessionId))
+                    {
+                        HttpContext.Session.SetString("GuestSessionId", cookieSessionId);
+                        guestSessionId = cookieSessionId;
+                    }
+                }
+                Console.WriteLine($"Using existing guest session ID: {guestSessionId}");
             }
             return guestSessionId;
         }
@@ -53,18 +80,23 @@ namespace ECommerceWeb.Controllers
             var userId = GetUserId();
             var isGuest = IsGuestUser();
             
+            Console.WriteLine($"OrderDetails - IsGuest: {isGuest}, UserId: {userId}");
+            
             List<ShoppingCart> cartItems;
             
             if (isGuest)
             {
                 // Guest kullanıcılar için session bazlı sepet
                 var guestSessionId = GetGuestSessionId();
+                Console.WriteLine($"OrderDetails - Getting guest cart for session: {guestSessionId}");
                 cartItems = (await _unitOfWork.ShoppingCart.GetGuestCartAsync(guestSessionId)).ToList();
+                Console.WriteLine($"OrderDetails - Guest cart items count: {cartItems.Count}");
             }
             else
             {
                 // Kayıtlı kullanıcılar için user bazlı sepet
                 cartItems = (await _unitOfWork.ShoppingCart.GetUserCartAsync(userId)).ToList();
+                Console.WriteLine($"OrderDetails - User cart items count: {cartItems.Count}");
             }
 
             if (!cartItems.Any())
@@ -103,8 +135,11 @@ namespace ECommerceWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CompleteOrder([FromForm] OrderDetailsVM model)
         {
+            Console.WriteLine($"CompleteOrder - Starting order completion");
+            
             if (!ModelState.IsValid)
             {
+                Console.WriteLine($"CompleteOrder - Model invalid: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
                 // Sepet verilerini yeniden yükle
                 await LoadCartData(model);
                 return View("OrderDetails", model);
@@ -113,16 +148,21 @@ namespace ECommerceWeb.Controllers
             var userId = GetUserId();
             var isGuest = IsGuestUser();
             
+            Console.WriteLine($"CompleteOrder - IsGuest: {isGuest}, UserId: {userId}");
+            
             List<ShoppingCart> cartItems;
             
             if (isGuest)
             {
                 var guestSessionId = GetGuestSessionId();
+                Console.WriteLine($"CompleteOrder - Getting guest cart for session: {guestSessionId}");
                 cartItems = (await _unitOfWork.ShoppingCart.GetGuestCartAsync(guestSessionId)).ToList();
+                Console.WriteLine($"CompleteOrder - Guest cart items count: {cartItems.Count}");
             }
             else
             {
                 cartItems = (await _unitOfWork.ShoppingCart.GetUserCartAsync(userId)).ToList();
+                Console.WriteLine($"CompleteOrder - User cart items count: {cartItems.Count}");
             }
 
             if (!cartItems.Any())

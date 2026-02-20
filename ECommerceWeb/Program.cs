@@ -17,6 +17,15 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+    options.Cookie.Name = "ECommerceSession";
+});
+
+// AntiForgery - JS ile uyumlu header adı
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
 });
 
 // DbContext
@@ -119,11 +128,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseSession(); // Session middleware
-app.UseRouting();
+app.UseRouting();      // 1
+app.UseSession();      // 2  
+app.UseAuthentication();  // 3
+app.UseAuthorization();   // 4
 
-app.UseAuthentication();
-app.UseAuthorization();
+
 
 app.MapStaticAssets();
 
